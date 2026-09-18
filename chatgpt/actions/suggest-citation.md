@@ -1,13 +1,11 @@
----
-description: claim에 맞는 [EVID:id] 출처 제안 (medical-kag GraphRAG 주, evidence.md 보조)
-args: claim
----
+> Action purpose: claim에 맞는 [EVID:id] 출처 제안 (medical-kag GraphRAG 주, evidence.md 보조)
+
 
 **언제 사용:** Phase 3(claim→citation mapping) / Phase 4(drafting)에서, 어떤 주장에 맞는 근거를 찾을 때.
 
 `docs/citation_assist_protocol.md` Operation 1을 따른다.
 
-대상 claim: **$ARGUMENTS**
+대상 claim: **[user-specified target/options]**
 
 1. **검색 (KAG 주):** medical-kag `search` (action `evidence`/`evidence_chain`/`best_evidence`)로 claim 근거 후보 → 근거수준 포함 랭킹.
 2. **Fallback (KAG 불가):** `knowledge/evidence.md` 스캔으로 매칭 항목 찾기 → 없으면 `python3 scripts/search_pubmed.py search "<claim 키워드>"`.

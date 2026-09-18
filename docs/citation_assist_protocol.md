@@ -33,7 +33,7 @@ Use in Phase 3 (claim→citation mapping, Rule 8) and Phase 4 (drafting).
 
 ---
 
-## Operation 2 — Claim-verification report (`/verify-claims [section]`)
+## Operation 2 — Claim-verification report (`verify-claims [section]`)
 
 Goal: a per-sentence "claim map" — is each cited sentence actually supported by its evidence?
 
@@ -54,7 +54,7 @@ Use as a **Phase 6 QC round** (claim-level grounding), complementing the determi
 
 ---
 
-## Operation 3 — Citation stance (`/cite-stance [claim | section]`)
+## Operation 3 — Citation stance (`인용이 균형적인지 봐줘`)
 
 Goal: tag how each cited source relates to a claim — supporting / contrasting / mentioning —
 so the Discussion stays balanced (Scite-style, claim-specific).
@@ -69,7 +69,7 @@ so the Discussion stays balanced (Scite-style, claim-specific).
 
 ---
 
-## Operation 4 — Evidence comparison table (`/evidence-table [topic | EVID ids]`)
+## Operation 4 — Evidence comparison table (`근거 비교표 만들어줘`)
 
 Goal: a "summary of included studies" table (Elicit-style) for the Discussion or a PRISMA
 supplement.
@@ -87,7 +87,7 @@ supplement.
 ## Guardrails
 
 - Never invent a citation to satisfy a claim — if nothing supports it, weaken or flag the claim
-  (CLAUDE.md Rule 1 + STOP signals).
+  (CHATGPT.md Rule 1 + STOP signals).
 - KAG is discovery/analysis; `evidence.md` stays canonical. Verify KAG numbers from the source
   (`evidence.md` / `results`) before they enter the manuscript.
 - Both operations degrade gracefully: with no MCP, `evidence.md` + `search_pubmed.py` keep them

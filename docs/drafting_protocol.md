@@ -100,7 +100,7 @@ Address high-priority findings before considering the section complete.
 섹션 작성이 끝나면 다음 단계로 넘어가기 전에 검증 게이트를 통과해야 한다.
 상세: `docs/verification_protocol.md`.
 
-1. 네 Verifier 서브에이전트를 투입한다 (모델: Opus 기본):
+1. ChatGPT main agent가 네 independent Verifier pass를 수행한다. 필요하면 sSb/mSb fresh-context reviewer를 추가한다:
    - **Constraint** — draft_plan·analysis_plan·사용자 제약 준수
    - **Citation** — `[EVID:id]` 인용이 evidence.md로 지지되는지 (방향·대상·비교군·결과 일치)
    - **Data** — 모든 결과 수치가 `results/*.csv`로 추적되는지
@@ -142,7 +142,7 @@ Address high-priority findings before considering the section complete.
 Use this sequence after each produce step:
 
 1. Run deterministic helpers first: `check_citations.py`, `check_numbers.py`, and for revision `check_revision_claims.py`.
-2. Run LLM semantic verifiers using `docs/verifier_prompt_templates.md`.
+2. Run independent LLM semantic verifier passes using `docs/verifier_prompt_templates.md`; deterministic scripts are executed explicitly through sSb/mSb first.
 3. Record the result in `review/gates/phase_NN_<name>.GATE.md`.
 4. Confirm the ledger before proceeding:
 

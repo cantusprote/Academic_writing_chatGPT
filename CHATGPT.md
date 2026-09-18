@@ -1,4 +1,4 @@
-# Academic Paper Writing Project — Sim Oncology Custom (v0.1.0; upstream v1.6.3)
+# Academic Paper Writing Project — Sim Oncology ChatGPT (v0.2.0; upstream v1.6.3)
 
 ## Research Configuration
 **Primary Domain:** Breast Medical Oncology / Translational Research
@@ -17,8 +17,8 @@
 ### Single Paper Project (기본)
 ```
 project/
-├── CLAUDE.md                     # This file - core rules & config
-├── AGENTS.MD                     # Agent bootstrap rules; points to CLAUDE.md as source of truth
+├── CHATGPT.md                     # This file - core rules & config
+├── AGENTS.MD                     # Agent bootstrap rules; points to CHATGPT.md as source of truth
 ├── .gitattributes                # Line-ending policy (text=auto eol=lf; prevents CRLF churn from OneDrive/Windows sync)
 ├── docs/                         # Reference guides (read when needed)
 │   ├── writing_guide.md          # Section-by-section writing guide
@@ -37,9 +37,9 @@ project/
 │   ├── figure_guide.md          # Figure generation guide
 │   ├── docx_guide.md            # DOCX 변환 가이드 (서식, 테이블, 네이밍)
 │   ├── draft_plan_template.md    # Draft plan 10개 항목 템플릿 (Phase 3에서 복사)
-│   ├── debate_protocol.md        # Claude–Codex co-author 토론 절차
+│   ├── debate_protocol.md        # ChatGPT + independent reviewer 토론 절차
 │   ├── critical_review_protocol.md  # 외부 멀티모델 적대적 검토 절차
-│   ├── style_transform_protocol.md  # /style-pass 변환 + Style Verifier
+│   ├── style_transform_protocol.md  # `chatgpt/actions/style-pass.md` action 변환 + Style Verifier
 │   ├── style_spec_template.md    # Style Spec 템플릿 (exemplar 바인딩)
 │   ├── citation_assist_protocol.md  # 출처 제안·claim 검증·stance·비교표 (GraphRAG)
 │   └── medical_kag_protocol.md   # medical-kag MCP 통합 (KG; evidence.md 정본)
@@ -90,21 +90,21 @@ project/
 │   ├── critical_review.py        # OpenRouter 멀티모델 적대적 검토 호출
 │   ├── critical_models.txt       # OpenRouter 모델 목록 (외부화)
 │   ├── critical_prompts/         # 적대적 검토 프롬프트 (manuscript.txt, response.txt, editor.txt)
-│   ├── verify_all.py             # /verify — citation+number(+gate) 일괄 검증
+│   ├── verify_all.py             # `chatgpt/actions/verify.md` action — citation+number(+gate) 일괄 검증
 │   ├── check_coverage.py         # 인용 coverage audit (과잉인용·미등록인용 주신호; 인용밀도; uncited는 중립)
 │   ├── format_references.py       # [EVID:id]→저널형 서지목록 + 본문 태그 변환 (MCP 독립; Phase 7)
 │   ├── check_abstract.py         # abstract↔본문 수치 일관성 (abstract-only 수치 차단; Phase 6, Rule 3)
 │   ├── check_crossrefs.py        # Table/Figure 본문 참조 ↔ 실존 대조 (broken ref·미인용·순서; advisory)
 │   ├── check_abbreviations.py    # 약어 첫 사용 정의 검사 (abstract/본문 scope 분리; advisory)
 │   ├── check_response_coverage.py # 리뷰어 코멘트 전수 응답 확인 (Phase 8; ghost-revision 보완)
-│   └── hooks/                    # 강제 훅 (enforce_gates, session_contract, lint_on_edit, style_intent)
+│   └── hooks/                    # upstream legacy hook scripts; ChatGPT workflow에서는 사용하지 않음
 ├── tests/                        # pytest suite for the verification scripts
 │   └── test_*.py                 # Run: pytest  (python-docx required, see requirements.txt)
 ├── .github/workflows/tests.yml   # CI: pytest on push to main + PRs (Python 3.10/3.11/3.12)
 ├── review/                       # Review & QC documents
 │   ├── qc_log.md                 # QC round tracking
 │   ├── gates/                    # 검증 게이트 원장 (phase_NN_*.GATE.md)
-│   ├── debates/                  # Claude–Codex 토론 로그
+│   ├── debates/                  # ChatGPT–reviewer 토론 로그
 │   └── critical/                 # 외부 멀티모델 적대적 검토 리포트
 └── output/                       # Final compiled manuscript
     ├── title_page_YYMMDD.docx
@@ -135,7 +135,7 @@ project/
 
 | File/Folder | Purpose | When to Use |
 |-------------|---------|-------------|
-| `CLAUDE.md` | Core rules, project config, writing style | Auto-loaded every session |
+| `CHATGPT.md` | Core rules, project config, writing style | Read explicitly at task/session start |
 | `.gitattributes` | Line-ending policy (`text=auto eol=lf`) — stores LF, normalizes on compare so OneDrive/Windows CRLF rewrites never produce content-free diffs | Git-managed (no manual edits needed) |
 | `docs/writing_guide.md` | Detailed section guidelines | When drafting specific sections |
 | `docs/drafting_protocol.md` | Mandatory outline → evidence-bound draft → style pass → QC workflow | Before drafting any section |
@@ -154,8 +154,8 @@ project/
 | `docs/figure_guide.md` | Figure generation guide (DPI, 팔레트, Python 템플릿) | Phase 2 (figure 생성 시) |
 | `docs/docx_guide.md` | DOCX 변환 가이드 (서식, 테이블 스타일, 네이밍 규칙) | Phase 7 (DOCX 변환 시 **반드시** 읽고 따를 것) |
 | `docs/draft_plan_template.md` | Draft plan 10개 항목 템플릿 (Phase 3에서 복사하여 사용) | Phase 3 시작 시 복사 → `drafts/draft_plan.md` |
-| `docs/debate_protocol.md` | Claude–Codex co-author 토론 절차 (라운드·역할·로그·폴백) | Phase 2·3·4·8 (`/paper-debate` 토론 시) |
-| `docs/critical_review_protocol.md` | 외부 멀티모델 적대적 검토 절차 (리뷰어 풀·합의도·폴백) | Phase 6 QC·Phase 8 (`/critical-review`) |
+| `docs/debate_protocol.md` | ChatGPT + independent reviewer co-author 토론 절차 (라운드·역할·로그·폴백) | Phase 2·3·4·8 (`paper debate` 요청 시) |
+| `docs/critical_review_protocol.md` | 독립/멀티모델 적대적 검토 절차 (리뷰어 풀·합의도·폴백) | Phase 6 QC·Phase 8 (`critical review` 요청 시) |
 | `profile/authors.md` | 저자 정보 (소속·연락처·ORCID·funding 문구 템플릿) | Title page 작성 시 **반드시** 참조 — 직접 입력 금지 |
 | `profile/journals.md` | 저널별 인용 형식 (bracket vs superscript, et al. 기준, volume 형식) | 참고문헌 목록 작성 시 확인 |
 | `knowledge/evidence.md` | 참고문헌 요약 정리 자료집 (논문별 요약·핵심·서지정보) | Phase 1 (setup) + 인용 시 참조 |
@@ -184,11 +184,11 @@ project/
 | `scripts/check_response_coverage.py` | response letter의 Comment↔Response 전수 매핑 + 원본 코멘트 파일 대조 — 미응답·빈 응답·placeholder 검출 (ghost-revision 게이트의 반대면; 기본 fail) | Phase 8 (`Check response coverage`) |
 | `scripts/check_numbers.py` | manuscript/table 수치를 `results/*.csv`와 대조 | Phase 4·6 data gate |
 | `scripts/check_gate.py` | `review/gates/*.GATE.md` 원장의 `status: PASS`와 필수 check를 검증 | 모든 phase gate 통과 직전 |
-| `scripts/check_style.py` | manuscript를 `drafts/style_spec.md` 목표와 대조 (측정형 스타일 게이트) | Phase 5·6 (`/style-pass`, `Check style`) |
-| `scripts/extract_claims.py` | 초안의 `[EVID:id]` 문장 추출 (claim-verification 입력) | Phase 6 (`/verify-claims`) |
-| `scripts/evidence_table.py` | 구조화 study 레코드 → markdown 비교표 (included studies) | Phase 6 (`/evidence-table`) |
+| `scripts/check_style.py` | manuscript를 `drafts/style_spec.md` 목표와 대조 (측정형 스타일 게이트) | Phase 5·6 (`style pass`, `Check style`) |
+| `scripts/extract_claims.py` | 초안의 `[EVID:id]` 문장 추출 (claim-verification 입력) | Phase 6 (`verify claims`) |
+| `scripts/evidence_table.py` | 구조화 study 레코드 → markdown 비교표 (included studies) | Phase 6 (`evidence table`) |
 | `docs/citation_assist_protocol.md` | 출처 제안 + claim 검증 + stance + 비교표 (GraphRAG 주, evidence.md 보조) | Phase 3·4·6 |
-| `docs/style_transform_protocol.md` | 초안→bound 학술/저널 스타일 변환 + Style Verifier·자동발동 | Phase 5 (`/style-pass`) |
+| `docs/style_transform_protocol.md` | 초안→bound 학술/저널 스타일 변환 + Style Verifier·명시적 실행 | Phase 5 (`style pass`) |
 | `docs/style_spec_template.md` | Style Spec 템플릿 (exemplar 바인딩, 목표 metric) | Phase 5 (Style Spec 작성) |
 | `review/qc_log.md` | QC round documentation | Phase 6 (track all QC iterations) |
 | `review/gates/` | 검증 게이트 원장 (Verifier PASS/FAIL 기록) | Phase 3·4·8 (게이트 통과 기록) |
@@ -284,7 +284,7 @@ These must match across **Abstract ↔ Methods ↔ Results ↔ Tables**:
 - Run **minimum 3 QC rounds** before submission
 - Follow `docs/qc_guide.md` for detailed procedures
 - Document all checks in `review/qc_log.md`
-- **진행 추적(선택):** QC 라운드·게이트 항목을 TodoWrite로 추적해 가시성을 높일 수 있다. 단 이는 **세션용 보조 도구일 뿐 정본(authoritative record)이 아니다** — 영속 기록은 `review/qc_log.md`와 `review/gates/`가 담당한다.
+- **진행 추적(선택):** QC 라운드·게이트 항목은 ChatGPT의 세션 내 task tracking으로 보조 추적할 수 있다. 단 이는 **세션용 보조 수단일 뿐 정본(authoritative record)이 아니다** — 영속 기록은 `review/qc_log.md`와 `review/gates/`가 담당한다.
 
 ### 5. File Versioning (파일 버전 관리)
 
@@ -366,7 +366,7 @@ These must match across **Abstract ↔ Methods ↔ Results ↔ Tables**:
 
 - **NEVER start drafting sections without first creating `draft_plan.md`**
 - 분석 결과(results/)를 확인한 후, 원고 작성 전에 전체 구성을 먼저 계획
-- **Step 0 (Socratic 브레인스토밍):** 항목을 채우기 전, 사용자에게 **한 번에 하나씩** 질문해 의도를 정제한다 (`docs/draft_plan_template.md` 상단). 이 답변은 `/paper-debate`의 R0 준비자료로 쓰되 토론 자체와는 별개다.
+- **Step 0 (Socratic 브레인스토밍):** 항목을 채우기 전, 사용자에게 **한 번에 하나씩** 질문해 의도를 정제한다 (`docs/draft_plan_template.md` 상단). 이 답변은 선택적 `paper debate`의 R0 준비자료로 쓰되 토론 자체와는 별개다.
 - 사용자가 draft_plan.md를 확인한 후에만 섹션 작성 진행
 - draft_plan.md가 존재하지 않으면 섹션 작성을 거부
 
@@ -410,10 +410,10 @@ These must match across **Abstract ↔ Methods ↔ Results ↔ Tables**:
 - **NEVER proceed past a gate without a recorded PASS.** `review/gates/`의 해당 산출물 항목에 `status: PASS`가 없으면 다음 섹션/단계 진행을 거부한다.
 - 검증은 **Verifier 서브에이전트**로 수행한다 (Draft: Constraint / Citation / Data / Logic 4종. Revision: Logic을 빼고 Revision-claims·Response-alignment를 더해 Constraint / Citation / Data / Revision-claims / Response-alignment). 외부지식 금지, 소스 오브 트루스(draft_plan·analysis_plan·evidence.md·results CSV)와만 대조.
 - FAIL 시 **자율 수정 루프**: 지적사항을 고쳐 재검증. 최대 **2회(N=2)**, 이후 사용자에게 에스컬레이션.
-- **Verifier 모델:** Opus 기본. Opus 불가 시 또는 사용자 요청 시 다른 모델(예: GPT-5.5) 허용.
+- **Verifier reasoning:** semantic verifier는 higher reasoning effort를 기본으로 사용한다. 모델명에 의존하지 않고 현재 ChatGPT runtime에서 사용 가능한 높은 추론 수준을 선택한다.
 - **인용 grounding:** 초안에서 모든 인용은 `[EVID:author_year]` 태그로 표기 (Phase 7에서 저널 형식 변환).
 - **수치 grounding:** 원고 결과 수치는 `results/*.csv`에 존재하는 값만 사용.
-- **Hook 강제 (결정적):** `.claude/settings.json`의 PreToolUse 훅(`Write/Edit/MultiEdit`)이 plan-first를 강제 — 완료·승인된 `draft_plan.md` 없이 섹션 작성, 완료·승인된 `analysis_plan.md` 없이 분석 스크립트 생성을 **차단**한다(Rule 7·8, fail-open). 미완성 템플릿/미체크 승인 plan은 plan으로 인정하지 않는다. SessionStart 훅이 본 계약(+활성 Style Spec)을 매 세션 주입. PostToolUse 훅(`lint_on_edit.py`)이 draft 편집마다 용어·표기 lint를 표면화하고, UserPromptSubmit 훅(`style_intent.py`)이 "학술적으로 바꿔줘" 류 입력에 style-pass protocol을 자동 주입한다. 결정적 검증은 `/verify`(`scripts/verify_all.py`)로 일괄 실행.
+- **ChatGPT + Shellby 명시적 강제:** 자동 runtime hook은 사용하지 않는다. 따라서 plan-first, Style Spec/terminology lint, style-pass, deterministic verification, semantic verifiers, gate recording/freshness checks를 각 Phase에서 **명시적으로 실행**해야 한다. 파일 작업은 ChatGPT가 Shellby를 통해 수행하며, **Mac Studio의 로컬 파일은 sSb**, **MacBook/로컬 파일은 mSb**를 사용한다. 자동 훅이 없다는 이유로 Rule 7/8/9 또는 verification semantics를 완화하지 않는다.
 
 **게이트 배치·병렬·freshness:** Phase별 게이트(3 Claim→Citation 사전검증 · 4 섹션 게이트 · 6 경량 · 8 응답 게이트), 병렬 검출, freshness 해시 규칙은 `docs/verification_protocol.md` §7/§3.1/§6 참조. PASS 시 산출물 sha256를 `provenance:`에 기록하고, 산출물이 바뀌면 stale로 보고 재검증(`check_gate.py --verify-hash`). **결정적 차원(citation/numbers/revision_claims)은 `check_gate.py --cross-check`로 원장의 `PASS`를 정본 checker 즉석 재실행과 대조** — 안 돌리고 적은 가짜 PASS나 stale PASS를 모순으로 차단(소스 미도달 시 loud FAIL).
 
@@ -441,25 +441,20 @@ These must match across **Abstract ↔ Methods ↔ Results ↔ Tables**:
 
 | Phase                    | 권장 모델           | 대안 모델         | 이유                                       |
 |--------------------------|---------------------|-------------------|--------------------------------------------|
-| Phase 1: Setup           | Opus/Sonnet         | —                 | 검색·정리 작업                             |
-| **Phase 2: Analysis**    | **Opus (권장)**     | Sonnet (가능)     | analysis_plan 작성은 Opus 권장             |
-| **Phase 3: Draft Plan**  | **Opus (권장)**     | —                 | 논문의 방향·논조·구성을 결정하는 핵심 단계 |
-| Phase 4: Draft           | Sonnet (기본)       | Opus (가능하면)   | draft_plan + evidence 기반 작성            |
-| Phase 5: Style Polish    | Sonnet (기본)       | Opus (가능하면)   | 규칙 기반 작업                             |
-| Phase 6: QC              | Sonnet (기본)       | Opus (가능하면)   | 체크리스트 기반 검증                       |
-| Phase 7: Finalize        | Sonnet              | —                 | DOCX 변환·서식 작업                        |
-| **Phase 8: Revision**    | **Opus (권장)**     | —                 | 리뷰어 대응은 전략적 판단 필요             |
-| **Verifier (모든 Phase)** | **Opus (기본)**    | GPT-5.5 등 (Opus 불가/요청 시) | 검증 품질이 하네스 신뢰성을 좌우          |
+| Phase | ChatGPT reasoning guidance |
+|---|---|
+| Phase 1: Setup | Normal reasoning for routine search, organization, and file preparation |
+| **Phase 2: Analysis** | **Higher reasoning effort** for estimand, endpoint, statistical/biomarker/ctDNA analysis planning |
+| **Phase 3: Draft Plan** | **Higher reasoning effort** for key message, structure, claim-citation map, and oncology reporting strategy |
+| Phase 4: Draft | Normal reasoning for routine evidence-grounded drafting; raise effort for difficult methodological/interpretive sections |
+| Phase 5: Style Polish | Normal reasoning plus explicit Style Spec, terminology, and style checks |
+| Phase 6: QC | Normal reasoning for deterministic checks; **higher reasoning effort for semantic verifiers** |
+| Phase 7: Finalize | Normal reasoning for formatting/reference conversion |
+| **Phase 8: Revision** | **Higher reasoning effort** for reviewer-response strategy and revision consistency |
+| **Verifier** | **Higher reasoning effort** for semantic Constraint/Citation/Data/Logic or revision verifiers |
 
-**사용자 안내 (모델 선택 가이드):**
-
-- **Opus 권장 단계:** Phase 2 (Analysis Plan), Phase 3 (Draft Plan), Phase 8 (Revision)
-  - 전략적 판단·설계가 필요한 단계 → Opus로 방향을 잡아야 이후 작업 품질이 보장됨
-  - Draft Plan 작성 시 Plan Mode(`/plan`) 활용을 권장하여 사용자와 충분한 논의 후 확정
-- **Sonnet 기본, Opus 가능하면 사용:** Phase 4-6 (Draft, Polish, QC)
-  - draft_plan.md + evidence.md가 잘 갖춰져 있으면 Sonnet으로도 충분
-  - 비용 여유가 있으면 Opus 사용이 더 좋은 결과를 냄
-- **핵심 원칙:** Plan은 Opus로 잘 잡고 → 작성은 Sonnet으로도 OK
+- Runtime-neutral principle: use the strongest reasoning effort available when strategic design, causal/statistical judgment, or semantic verification materially affects correctness.
+- Routine drafting and mechanical transformations normally use normal reasoning once plans, evidence, and gates are established.
 
 ### 12. Documentation, Versioning & Git Safety (Sim Custom)
 
@@ -479,7 +474,7 @@ These must match across **Abstract ↔ Methods ↔ Results ↔ Tables**:
 ## Natural Academic Writing Style
 
 > **상세 가이드: `docs/writing_guide.md`**
-> 규칙·표·예시는 writing_guide.md에 있음. CLAUDE.md는 워크플로·Phase 조정만 담당 (중복 방지).
+> 규칙·표·예시는 writing_guide.md에 있음. CHATGPT.md는 워크플로·Phase 조정만 담당 (중복 방지).
 
 **Phase 5 (Style Polish)에서 적용할 writing_guide.md 섹션:**
 
@@ -504,23 +499,23 @@ These must match across **Abstract ↔ Methods ↔ Results ↔ Tables**:
 
 ```
 Phase 1: Setup
-├── Define topic, journal, study design in CLAUDE.md
+├── Define topic, journal, study design in CHATGPT.md
 ├── Check profile/journals.md — 목표 저널 인용 형식 확인 (et al. 규칙, volume 형식 등)
 ├── Check Style/own/ — 관련 스타일 앵커 논문 확인 (용어·톤 일관성 참고)
-├── Search references: /search-evidence [query] 또는 scripts/search_pubmed.py
+├── Search references: `chatgpt/actions/search-evidence.md` action [query] 또는 scripts/search_pubmed.py
 ├── (선택) medical-kag MCP: search/hybrid_search 발굴 + conflict find로 논쟁 파악 → evidence.md 등록 (docs/medical_kag_protocol.md; evidence.md 정본 유지, 미연결 시 search_pubmed.py로 fallback)
-├── Import by DOI: /import-doi [doi]
+├── Import by DOI: `chatgpt/actions/import-doi.md` action [doi]
 ├── Save PDFs to knowledge/pdf/
 ├── Summarize & register in knowledge/evidence.md (docs/evidence_guide.md 참조)
 ├── 핵심 논문은 knowledge/summaries/에 상세 요약
 └── Read docs/writing_guide.md for target sections
 
-Phase 2: Statistical Analysis — Opus 권장 (analysis_plan)
+Phase 2: Statistical Analysis — higher reasoning effort 권장 (analysis_plan)
 ├── Read docs/oncology_analysis_guide.md first for oncology projects; use docs/statistical_analysis_guide.md for generic background
 ├── Place raw data (CSV/XLSX) in data/
-├── (선택) /paper-debate — 분석 접근을 통계 담당 공동 저자(Codex)와 토론 후 plan 작성
+├── (선택) `chatgpt/actions/paper-debate.md` action — 분석 접근을 독립 reviewer와 토론 후 plan 작성
 ├── Create data/analysis_plan.md (필수, 사용자 승인 후 진행)
-│   ├── Claude reads CSV → creates analysis plan → 사용자 확인
+│   ├── ChatGPT reads data via Shellby → creates analysis plan → 사용자 확인
 │   └── 포함 항목: estimand, analysis population, endpoint/time origin/censoring, model, multiplicity, missing data, sensitivity
 ├── Generate Python scripts in data/py/
 │   ├── 01_descriptive.py (demographics, baseline)
@@ -531,9 +526,9 @@ Phase 2: Statistical Analysis — Opus 권장 (analysis_plan)
 ├── Generate drafts/table_*.md from results CSV
 └── Generate figures → drafts/figures/
 
-Phase 3: Draft Plan (원고 구성 계획) — Opus 권장
-├── Step 0: Socratic 브레인스토밍 — 항목을 채우기 전 사용자에게 한 번에 하나씩 질문해 의도(key message) 정제 (draft_plan_template.md 상단; /paper-debate와 별개, R0 준비자료로 활용)
-├── (선택) /paper-debate — key message·구조를 전략 담당 공동 저자(Codex)와 토론 후 plan 작성
+Phase 3: Draft Plan (원고 구성 계획) — higher reasoning effort 권장
+├── Step 0: Socratic 브레인스토밍 — 항목을 채우기 전 사용자에게 한 번에 하나씩 질문해 의도(key message) 정제 (draft_plan_template.md 상단; `paper debate`와 별개, R0 준비자료로 활용)
+├── (선택) `chatgpt/actions/paper-debate.md` action — key message·구조를 독립 reviewer와 토론 후 plan 작성
 ├── Copy docs/draft_plan_template.md → drafts/draft_plan.md (또는 논문별 서브폴더)
 │   ├── Key message (이 논문의 핵심 메시지 1-2문장)
 │   ├── Tone & voice (논조/어조 설정)
@@ -552,7 +547,7 @@ Phase 3: Draft Plan (원고 구성 계획) — Opus 권장
 Phase 4: Draft (in this order)
 ├── Read docs/drafting_protocol.md + docs/section_templates.md before drafting
 ├── Apply Style/terminology.md and relevant Style anchors during drafting
-├── (선택) /paper-debate — 핵심 섹션 논증 골격을 논리 담당 공동 저자(Codex)와 토론 후 작성
+├── (선택) `chatgpt/actions/paper-debate.md` action — 핵심 섹션 논증 골격을 독립 reviewer와 토론 후 작성
 ├── 04_methods.md      → establishes framework
 │   └── Expert: Dr. Researcher B (methodology)
 ├── 05_results.md      → narrative (refer to drafts/table_*.md)
@@ -567,7 +562,7 @@ Phase 4: Draft (in this order)
 └── 🔒 GATE (각 섹션마다): Constraint + Citation + Data + Logic Verifier 자율 루프 (최대 2회) → review/gates/ 기록
 
 Phase 5: Style Polish
-├── /style-pass — 초안을 bound Style Spec/exemplar에 맞춰 섹션별 변환 + Style Verifier (docs/style_transform_protocol.md; "학술적으로 바꿔줘"에 자동 발동)
+├── `chatgpt/actions/style-pass.md` action — 초안을 bound Style Spec/exemplar에 맞춰 섹션별 변환 + Style Verifier (docs/style_transform_protocol.md; style transformation 요청 시 명시적으로 실행)
 ├── Apply writing_guide.md Style Reference Tables
 │   ├── Transition Words 업그레이드 (but → nonetheless)
 │   ├── Verb Upgrades (showed → demonstrated)
@@ -583,15 +578,15 @@ Phase 5: Style Polish
 └── Expert: Dr. Editor (final polish)
 
 Phase 6: QC (3 rounds CRITICAL, 6 rounds RECOMMENDED)
-├── Round 1: Number consistency — Claude 자동 + 사용자 확인 (qc_guide.md)
-├── Round 2: Reference verification — Claude + 사용자 (evidence.md 대조)
+├── Round 1: Number consistency — ChatGPT 명시적 실행 + 사용자 확인 (qc_guide.md)
+├── Round 2: Reference verification — ChatGPT + 사용자 (evidence.md 대조)
 ├── Round 3: Logic & flow check — Dr. Editor (section 간 흐름)
 ├── Round 4: Terminology/abbreviation/tense + style metrics — Dr. Editor + lint + check_style.py vs Style Spec (권장)
 ├── (권장) Check crossrefs / Check abbreviations — Table·Figure 참조 정합 + 약어 정의 advisory 점검
 ├── Round 5: Statistical quality — Dr. Statistician (권장)
-├── Round 6: Critical review — 내부(Dr. Editor + Dr. Statistician) + (선택) /critical-review 외부 멀티모델 (overclaiming/bias/일반화, 권장)
-├── Round 6.5 (선택): Editorial desk-screen — /editor-review: high-impact 저널 편집장 관점 (임상 타당성·분야 scope fit·추가검증 roadmap·하위저널 추천; advisory, `docs/critical_review_protocol.md` §5)
-├── Claim verification (선택): /verify-claims — 인용 문장별 SUPPORTED/PARTIAL/UNSUPPORTED 리포트 (docs/citation_assist_protocol.md; GraphRAG 주, evidence.md 보조)
+├── Round 6: Critical review — 내부(Dr. Editor + Dr. Statistician) + (선택) `chatgpt/actions/critical-review.md` action 외부 멀티모델 (overclaiming/bias/일반화, 권장)
+├── Round 6.5 (선택): Editorial desk-screen — `chatgpt/actions/editor-review.md` action: high-impact 저널 편집장 관점 (임상 타당성·분야 scope fit·추가검증 roadmap·하위저널 추천; advisory, `docs/critical_review_protocol.md` §5)
+├── Claim verification (선택): `chatgpt/actions/verify-claims.md` action — 인용 문장별 SUPPORTED/PARTIAL/UNSUPPORTED 리포트 (docs/citation_assist_protocol.md; GraphRAG 주, evidence.md 보조)
 ├── Document all rounds in review/qc_log.md
 ├── Run study-specific checklist (checklist_guide.md — CONSORT/STROBE/PRISMA/CARE)
 └── For oncology projects also run docs/oncology_checklist.md
@@ -611,7 +606,7 @@ Phase 8: Revision (리뷰어 코멘트 수신 후)
 ├── 리뷰어 코멘트 저장: review/reviewer_comments_REV1.md
 ├── Revision 폴더 생성: drafts/revision/REV1/, output/revision/REV1/
 ├── 수정된 섹션만 _REV1 접미사로 저장
-├── (선택) /paper-debate — 대응 전략을 공동 저자(Codex)와 토론 후 response 작성
+├── (선택) `chatgpt/actions/paper-debate.md` action — 대응 전략을 독립 reviewer와 토론 후 response 작성
 ├── Response letter 작성 → drafts/revision/REV1/response_letter_REV1.md
 ├── 🔒 GATE (각 응답마다): ghost-revision 검증 (응답 주장 ↔ 원고 diff 대조) 자율 루프
 ├── Check response coverage — 모든 리뷰어 코멘트에 응답 존재 확인 (check_response_coverage.py --comments)
@@ -639,113 +634,62 @@ Phase 8: Revision (리뷰어 코멘트 수신 후)
 
 ---
 
-## Quick Commands
+## Natural-language ChatGPT Actions
 
-### Setup & Research
-| Command | Action |
-|---------|--------|
-| `Setup project for [topic]` | Initialize folder structure |
-| `Process new PDFs` | Scan knowledge/pdf/, register unprocessed PDFs in evidence.md |
-| `/search-evidence [query]` | PubMed 검색 → 선택 → evidence.md 등록 (slash command) |
-| `/import-doi [doi]` | DOI로 논문 가져와서 evidence.md 등록 (slash command) |
-| `Read writing guide for [section]` | Load section-specific guidance |
+> 사용자는 slash command를 외울 필요가 없다. 아래 표현을 자연어로 요청하면 ChatGPT가 `chatgpt/actions/` playbook과 관련 문서를 읽고 sSb/mSb를 통해 실행한다.
 
-### Knowledge Graph (medical-kag MCP)
-> evidence.md 정본 유지 — 발굴/분석/포맷 보조. 미연결 시 search_pubmed.py로 fallback. 상세: `docs/medical_kag_protocol.md`
+### Setup & Evidence
+| User request example | ChatGPT action |
+|---|---|
+| `이 주제로 프로젝트 설정해줘` | Research configuration과 폴더 상태 확인/설정 |
+| `관련 근거 찾아서 evidence에 등록해줘` | `chatgpt/actions/search-evidence.md` |
+| `이 DOI 논문 evidence에 추가해줘` | `chatgpt/actions/import-doi.md` |
+| `새 PDF 처리해줘` | `knowledge/pdf/` 확인 → evidence registry 반영 |
 
-| Command | Action |
-|---------|--------|
-| `KAG search [topic]` | medical-kag `search`/`hybrid_search` 발굴 → evidence.md 등록 |
-| `KAG conflicts [topic/intervention]` | `conflict` find/detect — 상충 연구·overclaim 점검 (Phase 6) |
-| `KAG synthesize [intervention] [outcome]` | `conflict synthesize` — GRADE 근거 합성 (Discussion) |
-| `KAG compare [interv1] [interv2]` | `compare_interventions` (Discussion 비교) |
-| `KAG references [style/journal]` | `reference format_multiple` — 저널 스타일 참고문헌 목록 (Phase 7) |
+### Analysis & Planning
+| User request example | ChatGPT action |
+|---|---|
+| `데이터 분석 계획 만들어줘` | `data/analysis_plan.md` 작성; 사용자 승인 전 분석 금지 |
+| `이 analysis plan대로 분석해` | 승인 확인 후 `data/py/` 실행 → `results/` 생성 |
+| `draft plan 만들어줘` | `docs/draft_plan_template.md` 기반 `drafts/draft_plan.md` 작성 |
+| `논문 방향을 토론해봐` | `chatgpt/actions/paper-debate.md` |
 
-### Statistical Analysis
-| Command | Action |
-|---------|--------|
-| `Analyze data` | Read CSV from data/, create analysis_plan.md (필수, 승인 후 진행) |
-| `Generate analysis scripts` | Create Python scripts in data/py/ |
-| `Run analysis` | Execute Python scripts, export to results/ |
-| `Generate tables` | Create drafts/table_*.md from results CSV |
-| `Generate figures` | Create figures in drafts/figures/ |
-| `Summarize statistics` | Overview of all statistical results |
+### Drafting & Style
+| User request example | ChatGPT action |
+|---|---|
+| `Methods 작성해` / `Discussion 작성해` | 승인된 draft plan에 맞춰 해당 섹션 작성 |
+| `학술적으로 다듬어줘` / `저널 스타일로 바꿔줘` | `chatgpt/actions/style-pass.md` |
+| `이 claim에 맞는 reference 찾아줘` | `chatgpt/actions/suggest-citation.md` |
 
-### Draft Plan
+### QC & Review
+| User request example | ChatGPT action |
+|---|---|
+| `전체 검증해` | `chatgpt/actions/verify.md` + deterministic checkers + semantic verifier |
+| `claim별 citation 검증해` | `chatgpt/actions/verify-claims.md` |
+| `인용이 균형적인지 봐줘` | `chatgpt/actions/cite-stance.md` |
+| `근거 비교표 만들어줘` | `chatgpt/actions/evidence-table.md` |
+| `critical review 해` | `chatgpt/actions/critical-review.md` |
+| `editor review 해` | `chatgpt/actions/editor-review.md` |
+| `oncology checklist 돌려` | `docs/oncology_checklist.md` 적용 |
 
-| Command              | Action                                      |
-|----------------------|---------------------------------------------|
-| `Create draft plan`  | Copy docs/draft_plan_template.md → drafts/draft_plan.md, 10개 항목 작성 (Opus 권장) |
-| `Review draft plan`  | draft_plan.md 검토 및 수정 제안             |
+### Revision & Finalization
+| User request example | ChatGPT action |
+|---|---|
+| `reviewer comments 분석해` | comment triage + revision plan |
+| `response letter 작성해` | response template + `[CHANGE]` tracking |
+| `response coverage 검사해` | `check_response_coverage.py` + `check_revision_claims.py` |
+| `최종 DOCX 만들어줘` | `docs/docx_guide.md`에 따라 output 생성 |
+| `reference를 저널 형식으로 바꿔줘` | `scripts/format_references.py` 실행 |
 
-### Collaboration (Codex)
-| Command | Action |
-|---------|--------|
-| `/paper-debate <주제>` | Claude–Codex co-author 토론 (작성 전, `docs/debate_protocol.md`) |
-| `/critical-review <대상>` | 외부 멀티모델 적대적 reviewer 검토 (작성 후, `docs/critical_review_protocol.md`) |
-| `/editor-review <대상>` | high-impact 저널 **편집장 desk-screen** — 임상 타당성·분야 scope fit·추가검증·하위저널 추천 (`docs/critical_review_protocol.md` §5) |
+### Core verification commands used by ChatGPT through Shellby
 
-### Drafting
-| Command | Action |
-|---------|--------|
-| `Draft [section]` | Write specific section (draft_plan.md 기반) |
-| `Draft [section] as Dr. [Expert]` | Write with specific expert perspective |
-| `Review as Dr. [Expert]` | Get expert feedback on current draft |
-| `Team review [section]` | All experts review section |
-
-### Style & Polish
-| Command | Action |
-|---------|--------|
-| `/style-pass [scope]` | 초안→bound 학술/저널 스타일 섹션별 변환 + Style Verifier (docs/style_transform_protocol.md; "학술적으로 바꿔줘"에 자동 발동) |
-| `Apply writing style to [section]` | Apply Natural Academic Writing rules |
-| `Check transitions` | Find weak transitions (but, however overuse) |
-| `Upgrade verbs in [section]` | Replace basic verbs with academic alternatives |
-| `Polish as Dr. Editor` | Final language refinement |
-
-### QC & Verification
-| Command | Action |
-|---------|--------|
-| `Run QC round [1-6]` | Execute specific QC round per qc_guide.md |
-| `Check number consistency` | `python3 scripts/check_numbers.py drafts/05_results.md drafts/table_1.md --results results` 실행 |
-| `Check abstract` | `python3 scripts/check_abstract.py drafts/04_methods.md drafts/05_results.md drafts/table_1.md drafts/table_2.md --abstract drafts/02_abstract.md` 실행 (abstract 수치가 본문에 다 있는지; Rule 3 일관성) |
-| `Check style` | `python3 scripts/check_style.py check drafts/05_results.md --spec drafts/style_spec.md` 실행 (Style Spec 대비 측정형 게이트) |
-| `Verify references` | `python3 scripts/check_citations.py drafts/03_introduction.md --evidence knowledge/evidence.md` 실행 |
-| `Check coverage` | `python3 scripts/check_coverage.py drafts/03_introduction.md drafts/06_discussion.md --evidence knowledge/evidence.md --draft-plan drafts/draft_plan.md` 실행 (과잉인용·미등록인용·인용밀도 리포트; uncited는 중립. 기본 advisory, `--fail-on-over-citation`·`--fail-on-unknown`로 게이트화, `--max-citations-per-sentence N`로 임계 조정) |
-| `Check phase gate` | `python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md --results results` 실행 (freshness + ledger↔live cross-check 포함) |
-| `/verify [artifacts]` | `python3 scripts/verify_all.py drafts/05_results.md --results results --evidence knowledge/evidence.md --gate review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md` — citation+number+gate freshness+cross-check 일괄 검증 |
-| `/suggest-citation [claim]` | claim에 맞는 `[EVID:id]` 출처 제안 (medical-kag GraphRAG 주, evidence.md 보조; `docs/citation_assist_protocol.md`) |
-| `/verify-claims [section]` | 인용 문장별 SUPPORTED/PARTIAL/UNSUPPORTED 리포트 → `review/claim_verification.md` (`extract_claims.py` + Semantic-Citation Verifier) |
-| `/cite-stance [claim/section]` | 인용이 claim을 지지/반박/언급인지 분류 (Discussion 균형·overclaim 가드; `docs/citation_assist_protocol.md`) |
-| `/evidence-table [topic/ids]` | 논문 비교표(included studies) 생성 (`scripts/evidence_table.py`; Discussion/PRISMA supplement) |
-| `Check crossrefs` | `python3 scripts/check_crossrefs.py drafts/05_results.md drafts/06_discussion.md` 실행 (본문 Table/Figure 참조 ↔ 실존 대조 — broken ref·미인용·순서; advisory 기본, `--fail-on-broken`·`--fail-on-unreferenced`·`--fail-on-order`로 게이트화) |
-| `Check abbreviations` | `python3 scripts/check_abbreviations.py drafts/02_abstract.md drafts/03_introduction.md drafts/04_methods.md drafts/05_results.md drafts/06_discussion.md` 실행 (약어 첫 사용 정의 — abstract/본문 scope 분리; advisory, `--allow ABB` 반복 지정·`--strict`) |
-| `Check logic flow` | Verify narrative consistency |
-| `Run checklist for [study type]` | STROBE/CONSORT/PRISMA/CARE checklist |
-| `Run oncology checklist` | Apply `docs/oncology_checklist.md` (endpoint definitions, survival/response, biomarker/ctDNA, reporting) |
-
-### Revision (after reviewer comments)
-| Command | Action |
-|---------|--------|
-| `Analyze reviewer comments` | Comment 분류 (Major/Minor) 및 대응 전략 제안 |
-| `Draft response to reviewer [N]` | 특정 리뷰어 응답서 초안 작성 |
-| `Draft response letter` | 전체 응답서 초안 작성 |
-| `Review response letter` | Dr. Editor 관점에서 응답서 검토 |
-| `Check response completeness` | `python3 scripts/check_revision_claims.py drafts/revision\REV1\response_letter_REV1.md --strict` 실행 |
-| `Check response coverage` | `python3 scripts/check_response_coverage.py drafts/revision\REV1\response_letter_REV1.md --comments review/reviewer_comments_REV1.md` 실행 (모든 리뷰어 코멘트에 실제 응답이 있는지 — 미응답·빈 응답·placeholder 차단) |
-| `Compile response letter` | `python3 scripts/compile_response_docx.py drafts/revision\REV1\response_letter_REV1.md` 실행 |
-
-### Figures
-| Command | Action |
-|---------|--------|
-| `Generate figure for [data/analysis]` | Read figure_guide.md → Python figure 생성 |
-| `Check figure quality` | DPI, 색맹 팔레트, 흑백 구분 확인 |
-
-### Finalize
-| Command | Action |
-|---------|--------|
-| `Compile manuscript` | Read `docs/docx_guide.md` → DOCX 변환 (규칙대로) |
-| `Format references for [journal]` | `python3 scripts/format_references.py drafts/03_introduction.md drafts/06_discussion.md --evidence knowledge/evidence.md --style numbered --convert` 실행 → 서지목록 + `*_formatted.md` (저널 스타일은 profile/journals.md 참조; MCP 독립). medical-kag 연결 시 `KAG references`로 KG 기반 포맷도 가능 |
-| `Generate submission checklist` | Pre-submission verification |
+```bash
+python3 scripts/check_citations.py drafts/03_introduction.md --evidence knowledge/evidence.md
+python3 scripts/check_numbers.py drafts/05_results.md drafts/table_1.md --results results
+python3 scripts/check_abstract.py drafts/04_methods.md drafts/05_results.md drafts/table_1.md drafts/table_2.md --abstract drafts/02_abstract.md
+python3 scripts/check_crossrefs.py drafts/05_results.md drafts/06_discussion.md
+python3 scripts/check_abbreviations.py drafts/02_abstract.md drafts/03_introduction.md drafts/04_methods.md drafts/05_results.md drafts/06_discussion.md
+```
 
 ---
 
@@ -776,10 +720,10 @@ python3 scripts/search_pubmed.py related <PMID>           # 관련 논문 검색
 - `--format table|evidence|json`: 출력 형식
 - `--start-num N`: evidence 형식 시작 번호
 
-**Slash command (Claude 대화 내):**
+**ChatGPT action playbooks:**
 
-- `/search-evidence [query]`: 검색 → 선택 → abstract 기반 TODO 채우기 → evidence.md 등록
-- `/import-doi [doi]`: DOI → evidence.md 등록
+- `chatgpt/actions/search-evidence.md`: 검색 → 선택 → abstract 기반 TODO 채우기 → evidence.md 등록
+- `chatgpt/actions/import-doi.md`: DOI → evidence.md 등록
 
 ### Expert Simulation
 When drafting, invoke experts from `docs/expert_roles.md`:

@@ -28,7 +28,7 @@ provenance:               # sha256 of the state this PASS was earned against
   results: a14e...c8d2    # sha256 of the results CSV the numbers were traced to
 round: 2                  # max 2 fix/re-verify attempts
 blocking_failures: none
-verifier_model: opus
+verifier_model: ChatGPT
 timestamp: 2026-06-18T10:30:00+09:00
 ```
 
@@ -41,7 +41,7 @@ timestamp: 2026-06-18T10:30:00+09:00
 A PASS is only valid for the artifact state it was earned against. Without this, a
 section can pass the gate, then be edited (e.g. to fix one verifier's finding), and the
 old PASS silently survives — its numbers or citations no longer re-checked. This is the
-main risk once the four verifiers run **in parallel**: a fix applied after a co-verifier
+main risk once the independent verifier passes run against the same frozen artifact: a fix applied after a co-verifier
 already returned PASS leaves that PASS stale.
 
 Mechanism:
@@ -126,6 +126,6 @@ checks:
   logic: FAIL
 round: 2
 blocking_failures: unsupported citation in paragraph 3; repeated Results sentence in Discussion
-verifier_model: opus
+verifier_model: ChatGPT
 timestamp: 2026-06-18T11:10:00+09:00
 ```

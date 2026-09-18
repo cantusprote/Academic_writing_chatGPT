@@ -1,9 +1,7 @@
 # Style Transformation Protocol
 
 > Turn a rough draft into bound academic/journal style — reliably, without repeating the
-> same style note. Triggered by `/style-pass`, or automatically when you ask to "make it
-> academic / 학술적으로 바꿔줘" (the `scripts/hooks/style_intent.py` UserPromptSubmit hook
-> injects this protocol). Used in Phase 5 (Style Polish) and Phase 8 (revision rewrites).
+> same style note. Trigger it by asking ChatGPT naturally to run a style pass or to "make it academic / 학술적으로 바꿔줘". ChatGPT applies this protocol explicitly; no slash command or automatic hook is assumed. Used in Phase 5 (Style Polish) and Phase 8 (revision rewrites).
 
 ## Why this exists
 
@@ -12,7 +10,7 @@ anchors never fit in active context. This protocol fixes that by (1) binding ONE
 into a compact **Style Spec** that loads every session, (2) transforming **section by
 section** grounded on that spec, and (3) verifying each section with an independent
 **Style-Conformance Verifier** (auto-fix loop). The deterministic word/notation layer is
-handled by `scripts/hooks/lint_on_edit.py`.
+checked explicitly by ChatGPT through sSb/mSb, normally with `scripts/lint_manuscript.py`.
 
 ## Inputs (source of truth)
 
@@ -26,7 +24,7 @@ No outside style preferences. If there is no Style Spec, create one first (Step 
 ## Procedure
 
 ### Step 0 — Bind an exemplar (once per project)
-If `drafts/style_spec.md` is absent: ask (`AskUserQuestion`) which anchor to bind — recommend
+If `drafts/style_spec.md` is absent: ask the user which anchor to bind — recommend
 the closest `Style/own/` paper or the `Style/target_journal/` paper. Copy
 `docs/style_spec_template.md` → `drafts/style_spec.md` and fill the targets from that anchor
 (+ `profile/journals.md` for reference format). Get the author's confirmation.
@@ -49,8 +47,7 @@ flags metric deviations (word count, mean sentence length, paragraphs, citation 
 the Spec targets. Then the **Style-Conformance Verifier** (`docs/verifier_prompt_templates.md`)
 on the section against the Style Spec + exemplar for the qualitative layer (flow, claim
 strength, "Do Not Imitate"). On FAIL, fix and re-verify — **max 2 loops**, then escalate to
-the author. The `lint_on_edit.py` hook also surfaces terminology + style-metric residue
-automatically after each edit when a Style Spec exists.
+the author. After each edit, ChatGPT explicitly runs the relevant deterministic style/terminology checks through sSb/mSb.
 
 ### Step 4 — Record
 Record a `style` check PASS in `review/gates/phase_05_style.GATE.md` (template
@@ -59,8 +56,8 @@ Record a `style` check PASS in `review/gates/phase_05_style.GATE.md` (template
 ## Guardrails
 
 - Grounding is unchanged: never invent citations or numbers to fit a sentence pattern
-  (CLAUDE.md Rule 1 + STOP signals). Style is not a license to overclaim — the Spec's
+  (CHATGPT.md Rule 1 + STOP signals). Style is not a license to overclaim — the Spec's
   claim-strength calibration is binding.
 - Over-compression caution: apply the `writing_guide` Concision Pass, but do not delete
   clinical qualifiers, safety caveats, or grounded numbers to hit a length target.
-- The auto-trigger is advisory and fails open; it never blocks your prompt.
+- Natural-language style requests are advisory workflow actions; they do not create an automatic runtime hook.

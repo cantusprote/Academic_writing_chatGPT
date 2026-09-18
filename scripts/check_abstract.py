@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Abstract <-> body number consistency (Phase 6 QC, Rule 3).
 
-CLAUDE.md Rule 3 requires patient counts, statistics, and outcomes to match across
+CHATGPT.md Rule 3 requires patient counts, statistics, and outcomes to match across
 **Abstract <-> Methods <-> Results <-> Tables**. `check_numbers.py` already ties
 every number to `results/*.csv`, but it does not specifically catch the classic
 reviewer complaint: *a number stated in the abstract that never appears in the body*

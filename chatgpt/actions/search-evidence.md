@@ -1,13 +1,11 @@
----
-description: Search PubMed and register results in evidence.md
-args: query
----
+> Action purpose: Search PubMed and register results in evidence.md
+
 
 **When to use:** Phase 1, when you need NEW references — search PubMed for a topic and register the selected articles into `knowledge/evidence.md`.
 
 # PubMed Search & Evidence Registration
 
-Search query: **$ARGUMENTS**
+Search query: **[user-specified target/options]**
 
 ## Instructions
 
@@ -24,7 +22,7 @@ You have a Python script at `scripts/search_pubmed.py` that queries the NCBI E-u
 
 Run the search script:
 ```bash
-python3 scripts/search_pubmed.py search "$ARGUMENTS" --max 20
+python3 scripts/search_pubmed.py search "[user-specified target/options]" --max 20
 ```
 
 Show the results table to the user.

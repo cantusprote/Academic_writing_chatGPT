@@ -113,7 +113,7 @@ generator**, never as a drop-in source. Workflow:
    must first be registered in `evidence.md` as `[EVID:id]` with a verified PMID/DOI. The KG is
    not a citation source (see the grounding rule above).
 4. **Write it down, then verify.** Draft the Discussion/Limitations paragraph, then run the
-   normal Phase 4/6 gates — `check_citations.py`, `check_numbers.py`, and `/cite-stance` for
+   normal Phase 4/6 gates — `check_citations.py`, `check_numbers.py`, and the citation-stance action for
    one-sidedness. KG-sourced comparisons are not exempt from the gates.
 
 Discussion / Limitations skeleton (fill from filtered KG output, then ground + cite):
@@ -126,8 +126,8 @@ Limitation: the evidence base for <outcome> is <sparse/conflicting> (KG conflict
 <outcome>), so this comparison should be read with caution.
 ```
 
-## Codex / cross-runtime
+## ChatGPT / Shellby runtime
 
-From Codex or another runtime, the same MCP tools are reachable via tool search. If medical-kag
+From ChatGPT, use sSb/mSb Shellby tools explicitly for the same local MCP workflow. If medical-kag
 is unavailable there, follow the fallback above — `search_pubmed.py` + `evidence.md` keep the
 workflow fully functional.

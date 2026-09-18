@@ -2,7 +2,7 @@
 
 > Copy to `drafts/style_spec.md` (multi-paper: `drafts/paper{N}_xxx/style_spec.md`).
 > Bind ONE exemplar and distil it into the checkable targets below. Keep it ~1 page so it
-> loads every session (the SessionStart hook surfaces it). The Style Verifier checks each
+> is read by ChatGPT at the start of relevant drafting/revision work; no automatic SessionStart hook is assumed. The Style Verifier checks each
 > transformed section against THIS file — so fill the targets concretely, not vaguely.
 
 ## Bound Exemplar
@@ -33,7 +33,7 @@
 ## Section Structure Flow
 - **Introduction:** burden → current treatment → gap → aim
 - **Discussion:** principal finding → mechanism → comparison without overclaim → limitations → conclusion
-- **Results:** narrative refers to tables; do not restate exact numbers (CLAUDE.md Rule 2)
+- **Results:** narrative refers to tables; do not restate exact numbers (CHATGPT.md Rule 2)
 
 ## Reusable Boilerplate (generalized from the exemplar — patterns, not verbatim)
 - Study design: "[generalized pattern with [placeholders]]"
@@ -47,7 +47,7 @@
 ## Calibration Example (before → after)
 > One or two pairs from THIS project: a rough sentence and its on-style rewrite. Concrete
 > examples steer the transform far better than abstract rules — fill these during the first
-> `/style-pass`.
+> ChatGPT natural-language style-pass action.
 
 - **Before:** [rough draft sentence]
   **After:** [same content rewritten to the bound style]

@@ -1,25 +1,22 @@
-# Debate Log
+# Debate / Independent Review Log
 
-주제: <TOPIC>
-단계: <Phase 2/3/4/8 또는 수동>
-Codex 역할: <전략/통계/논리 담당 공동 저자 | 공동 저자 | 균형 비평자>
-날짜: <YYYY-MM-DD>
-결과: <합의 | 부분 합의 | 미합의>
+- Topic: <topic>
+- Phase: <analysis / draft plan / logic / revision>
+- Main ChatGPT role: <primary author/orchestrator>
+- Independent reviewer: <Shellby subagent / second-pass reviewer / external model>
+- Date: <YYYY-MM-DD>
 
-## Claude 초기 입장
-<...>
+## Main ChatGPT initial position
+<proposal + rationale>
 
-## Codex 초기 입장
-<...>
+## Independent reviewer critique
+<counterpoints / alternative>
 
-## 라운드별 교환 (요약)
-- R1: <...>
-- R2: <...>
-- R3: <...>
+## Round 2 (if needed)
+<response and remaining disagreement>
 
-## 최종 합의
-<합의 내용>
-<미합의 시: 차이점 표 + Claude 추천>
+## Final synthesis
+<agreed decision, unresolved uncertainty, and what changes in the plan/manuscript>
 
-## 반영처
-<합의가 반영된 plan/draft/response 파일 경로>
+## Unresolved issues
+<none, or concise list + user decision needed>

@@ -1,13 +1,13 @@
 # Draft Plan Template
 
-> draft plan을 확정하기 전에 `/paper-debate <논문 방향> planning`으로 전략 담당 공동 저자(Codex)와 토론할 수 있다 (선택). 절차: `docs/debate_protocol.md`.
+> draft plan을 확정하기 전에 `paper-debate <논문 방향> planning`으로 ChatGPT main agent + optional sSb/mSb independent reviewer로 토론할 수 있다 (선택). 절차: `docs/debate_protocol.md`.
 
 > Phase 3에서 이 파일을 복사하여 사용:
 > `cp docs/draft_plan_template.md drafts/draft_plan.md`  (single paper)
 > `cp docs/draft_plan_template.md drafts/paper1_xxx/draft_plan.md`  (multi-paper)
 >
 > **규칙:** 모든 항목 완결 후 사용자 승인 → Phase 4 진행
-> **권장 모델:** Opus (Phase 3는 논문 방향·논조·구성을 결정하는 핵심 단계)
+> **권장 실행:** Phase 3는 논문 방향·논조·구성을 결정하는 핵심 단계이므로 ChatGPT에서 가능한 경우 **higher reasoning effort**를 사용한다.
 
 ---
 
@@ -19,10 +19,10 @@
 >
 > 수집된 답변의 용도:
 > - **(a)** 아래 draft-plan 항목(1. Key Message, 2. Tone & Voice, 4. Evidence Gap, 8. Discussion Outline, 9. Limitation Points 등)을 직접 채우는 씨앗이 된다.
-> - **(b)** 선택적 `/paper-debate`의 **R0 준비 자료(prep material)**로 쓸 수 있다.
+> - **(b)** 선택적 `paper-debate`의 **R0 준비 자료(prep material)**로 쓸 수 있다.
 >
-> **주의 (역할 구분):** 이 Step 0는 저자 의도를 끌어내는 **user-intake**이며, `/paper-debate`와 **별개**다.
-> `/paper-debate`(`docs/debate_protocol.md`)는 Claude–Codex **공동 저자 토론**이지 저자에게 묻는 절차가 아니다.
+> **주의 (역할 구분):** 이 Step 0는 저자 의도를 끌어내는 **user-intake**이며, `paper-debate`와 **별개**다.
+> `paper-debate`(`docs/debate_protocol.md`)는 ChatGPT + optional Shellby independent review이지 저자에게 묻는 절차가 아니다.
 > 여기서 모은 답변은 이후 토론에 입력될 수 있는 **R0 입력값**일 뿐, 토론 프로토콜 자체의 일부는 아니다.
 
 ---

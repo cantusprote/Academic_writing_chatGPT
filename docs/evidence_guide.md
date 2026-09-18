@@ -69,7 +69,7 @@ Style anchor 자료는 `knowledge/`가 아니라 최상위 `Style/` 폴더에 �
 
 사용자: "Process new PDFs"
 
-Claude:
+ChatGPT:
   1. pdf/ 폴더 스캔 → 3개 PDF 발견
   2. evidence.md 확인 → 모두 미등록
   3. 각 PDF 읽기 → evidence.md에 [1], [2], [3] 등록

@@ -2,8 +2,8 @@
 
 ## Baseline
 
-- Custom project: `Academic_writing`
-- Custom version: `v0.1.0`
+- Custom project: `Academic_writing_chatGPT`
+- Custom version: `v0.2.0`
 - Upstream repository: `grotyx/Academic_writing_c_claudecode`
 - Upstream baseline: **v1.6.3**, commit `e0527e2`
 - Local tag preserving the baseline: `upstream-v1.6.3`
@@ -18,9 +18,9 @@ The upstream evolved from a manuscript template into a workflow-enforced product
 2. `results/*.csv` as the numerical source of truth plus number checkers.
 3. Phase gate ledgers with SHA-256 provenance, stale-gate detection, and live cross-checks.
 4. Draft-plan and analysis-plan enforcement hooks.
-5. Style anchors, terminology registry, `/style-pass`, and measurable style checking.
+5. Style anchors, terminology registry, explicit style-pass playbook, and measurable style checking.
 6. Citation-assist commands, claim verification, citation stance, and evidence tables.
-7. Claude/Codex debate, multi-model critical review, and editor-style screening.
+7. Upstream multi-agent debate/review concepts, adapted here to ChatGPT + Shellby independent review and optional external models.
 8. Revision ghost-change and reviewer-response coverage checks.
 9. pytest test suite and GitHub Actions CI.
 
@@ -42,9 +42,9 @@ The analysis sequence is:
 
 Use `docs/oncology_checklist.md` in addition to the general study-design checklist. The oncology layer explicitly covers STEEP 2.0/NeoSTEEP concepts, RECIST-based response reporting, biomarker interaction, competing risks, and serial ctDNA timing.
 
-### macOS
+### ChatGPT + Shellby runtime
 
-Claude Code hooks use `python3` rather than the upstream Windows-oriented `py` command.
+This fork is operated from ChatGPT. Local file work is performed through **sSb on Mac Studio** or **mSb on MacBook**. There are no automatic runtime hooks; ChatGPT explicitly executes plan checks, lint/style checks, deterministic verification, semantic verifier passes, and gate provenance steps. All local Python commands use `python3`.
 
 ### Git model
 

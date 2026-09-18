@@ -463,7 +463,7 @@ python3 scripts/check_abbreviations.py drafts/02_abstract.md drafts/03_introduct
 
 > 리뷰어의 시각에서 논문의 논리적 취약점과 과장을 점검합니다.
 > "만약 내가 이 논문의 리뷰어라면 무엇을 지적할까?"
-> 외부 강화: `/critical-review`로 여러 모델(Claude 서브·Codex·OpenRouter)이 적대적으로 공격하게 할 수 있다 (선택). 절차: `docs/critical_review_protocol.md`.
+> 외부 강화: `critical-review`라고 자연어로 요청해 ChatGPT main agent에 sSb/mSb independent review 또는 optional external second-model review를 추가할 수 있다. 절차: `docs/critical_review_protocol.md`.
 
 ### 6.1 Overclaiming Check (과장 여부)
 
@@ -538,7 +538,7 @@ Q6: Missing data가 결과에 영향을 줄 수 있는가?
 
 ## Round 1: Number Consistency
 **Date:** YYYY-MM-DD
-**Performed by:** [Name/Claude]
+**Performed by:** [Name/ChatGPT]
 
 ### Findings:
 | Issue | Location | Current | Should Be | Fixed? |
@@ -611,7 +611,7 @@ Q6: Missing data가 결과에 영향을 줄 수 있는가?
 
 ## Round 4: Terminology, Abbreviation & Tense
 **Date:** YYYY-MM-DD
-**Performed by:** [Name/Claude]
+**Performed by:** [Name/ChatGPT]
 
 ### Findings:
 | Category | Issue | Location | Action | Fixed? |

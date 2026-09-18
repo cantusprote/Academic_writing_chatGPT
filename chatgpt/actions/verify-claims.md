@@ -1,13 +1,11 @@
----
-description: 초안의 각 [EVID:id] 문장을 근거와 대조해 SUPPORTED/PARTIAL/UNSUPPORTED 분류 리포트 (GraphRAG 주, evidence.md 보조)
-args: section
----
+> Action purpose: 초안의 각 [EVID:id] 문장을 근거와 대조해 SUPPORTED/PARTIAL/UNSUPPORTED 분류 리포트 (GraphRAG 주, evidence.md 보조)
+
 
 **언제 사용:** Phase 6 QC — 인용 문장이 실제로 근거에 의해 지지되는지 **문장별** 점검 (check_citations의 존재 확인보다 한 단계 깊음).
 
 `docs/citation_assist_protocol.md` Operation 2를 따른다.
 
-대상: **$ARGUMENTS** (생략 시 drafts의 본문 섹션들)
+대상: **[user-specified target/options]** (생략 시 drafts의 본문 섹션들)
 
 1. **claim 추출:** `python3 scripts/extract_claims.py <section> --json` → `[EVID:id]` 문장 목록.
 2. **근거 회수:** 각 `[EVID:id]`의 출처 내용 — medical-kag(KAG 주: 구조화 데이터/chunk) 또는 evidence.md 항목(보조).

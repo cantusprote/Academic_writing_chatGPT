@@ -1,6 +1,6 @@
 # Revision & Reviewer Response Guide (v0.5.1)
 
-> 대응 전략을 정하기 전에 `/paper-debate <코멘트 주제> revision`으로 공동 저자(Codex)와 함께 reviewer 대응을 설계할 수 있다 (선택). 절차: `docs/debate_protocol.md`.
+> 대응 전략을 정하기 전에 `paper-debate <코멘트 주제> revision`으로 ChatGPT main agent + optional sSb/mSb independent reviewer로 reviewer 대응을 설계할 수 있다 (선택). 절차: `docs/debate_protocol.md`.
 
 > 리뷰어 코멘트 대응 및 수정 원고 작성을 위한 가이드
 
@@ -316,7 +316,7 @@ output/revision/
 1. **Round 1·3은 항상 재수행** — 최소 변경도 연쇄 영향 가능
 2. **review/qc_log.md에 REV{N} 라운드 기록** — "QC Round 1 re-run for REV1, 2026-MM-DD, no discrepancies"
 3. **변경된 숫자는 Abstract·Methods·Results·Discussion·Tables 5곳에서 교차 검증**
-4. **스타일 re-grounding (수정 전 필수):** 각 섹션을 고치기 전에 `docs/writing_guide.md`의 해당 섹션 규칙 + `docs/section_templates.md` + 선택한 스타일 exemplar(`Style/own/` 또는 `Style/target_journal/`) + `Style/terminology.md`를 **다시 읽고** 적용한다 — 흐릿한 기억이 아니라 실제 규칙으로. 수정 후 PostToolUse lint 훅(`scripts/hooks/lint_on_edit.py`)이 용어·표기 위반을 자동 표면화한다.
+4. **스타일 re-grounding (수정 전 필수):** 각 섹션을 고치기 전에 `docs/writing_guide.md`의 해당 섹션 규칙 + `docs/section_templates.md` + 선택한 스타일 exemplar(`Style/own/` 또는 `Style/target_journal/`) + `Style/terminology.md`를 **다시 읽고** 적용한다 — 흐릿한 기억이 아니라 실제 규칙으로. 수정 후 ChatGPT가 sSb/mSb에서 `scripts/lint_manuscript.py`를 명시적으로 실행해 용어·표기 위반을 확인한다.
 5. **응답서 제출 전 최종 Round 1 검증** — 응답서에 기록한 수정 숫자와 원고 숫자 일치
 6. **Ghost-revision 게이트 (필수):** 각 응답의 `[CHANGE]` 마커마다 원고 diff를 대조하여 주장한 변경이 실제로 반영됐는지 확인한다. Constraint/Citation/Data Verifier도 변경된 섹션에 재투입한다. 결과를 `review/gates/phase_08_revision.GATE.md`에 기록한다. 상세: `docs/verification_protocol.md`.
 
@@ -332,7 +332,7 @@ output/revision/
 
 ---
 
-## Quick Commands
+## ChatGPT Natural-Language Actions
 
 | Command | Action |
 |---------|--------|

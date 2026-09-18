@@ -40,7 +40,7 @@ Use for: instruction violations, section guardrails, forbidden content, missing 
 
 Required inputs:
 
-- `CLAUDE.md`
+- `CHATGPT.md`
 - `docs/drafting_protocol.md`
 - `docs/section_templates.md`
 - `drafts/draft_plan.md`
@@ -154,7 +154,7 @@ Return only the Common Output Schema.
 ## Style-Conformance Verifier
 
 Use for: whether a transformed section matches the project's bound style during the
-style-pass (Phase 5) or a revision rewrite. Run after `scripts/hooks/lint_on_edit.py`
+style-pass (Phase 5) or a revision rewrite. Run after ChatGPT explicitly executes `scripts/lint_manuscript.py` through sSb/mSb
 (or `lint_manuscript.py`) has handled the deterministic terminology/notation layer.
 
 Required inputs:

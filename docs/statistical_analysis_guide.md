@@ -2,7 +2,7 @@
 
 > **Sim oncology custom override:** this is the upstream generic guide and retains legacy spine examples. For breast oncology/translational studies, read `docs/oncology_analysis_guide.md` first. When the two conflict, the oncology guide takes precedence, especially for endpoint/estimand definition, survival/competing risks, biomarker interactions, ctDNA timing, normality assessment, and multiplicity.
 
-> 분석 접근을 확정하기 전에 `/paper-debate <분석 주제> stats`로 통계 담당 공동 저자(Codex)와 토론할 수 있다 (작성 전, 선택). 절차: `docs/debate_protocol.md`.
+> 분석 접근을 확정하기 전에 `paper-debate <분석 주제> stats`로 ChatGPT main agent + optional sSb/mSb independent reviewer로 토론할 수 있다 (작성 전, 선택). 절차: `docs/debate_protocol.md`.
 
 > 통계 분석 수행 및 결과 정리를 위한 상세 가이드
 > Dr. Statistician의 역할을 기반으로 작성됨
@@ -570,7 +570,7 @@ Relationships:
 
 ### Avoid Triple Duplication
 
-> Canonical rules: **CLAUDE.md Rule 2 (Redundancy Prevention)**. In short: the same data should not appear in Results text + Table + Figure together — prefer Table-only or Figure-only with a brief text reference.
+> Canonical rules: **CHATGPT.md Rule 2 (Redundancy Prevention)**. In short: the same data should not appear in Results text + Table + Figure together — prefer Table-only or Figure-only with a brief text reference.
 
 ### Results Text Writing Rules
 
