@@ -6,7 +6,9 @@ Claude AI를 활용한 의학 학술 논문 작성을 위한 체계적인 워크
 
 ## 버전
 
-**v1.6.3** (2026-07-02)
+**Sim Oncology Custom v0.1.0** — upstream **v1.6.3** (2026-07-02) 기반
+
+upstream verification harness는 유지하면서 유방암 내과종양/중개연구 layer를 추가한 fork입니다. `docs/customization.md`, `docs/oncology_analysis_guide.md`, `docs/oncology_checklist.md`를 우선 참조합니다.
 
 [![tests](https://github.com/grotyx/Academic_writing_c_claudecode/actions/workflows/tests.yml/badge.svg)](https://github.com/grotyx/Academic_writing_c_claudecode/actions/workflows/tests.yml)
 
@@ -141,7 +143,7 @@ project/
 ## 빠른 시작
 
 1. **설정**: `CLAUDE.md`에 연구 주제, 목표 저널, 연구 설계를 입력합니다. `profile/journals.md`에서 인용 형식, `Style/`에서 스타일 앵커를 확인합니다.
-2. **참고문헌**: `/search-evidence [검색어]` 또는 `py scripts\search_pubmed.py`로 PubMed를 검색하고 `knowledge/evidence.md`에 등록합니다
+2. **참고문헌**: `/search-evidence [검색어]` 또는 `python3 scripts/search_pubmed.py`로 PubMed를 검색하고 `knowledge/evidence.md`에 등록합니다
 3. **데이터 분석**: `data/` 폴더에 데이터를 배치 → `analysis_plan.md` 작성 (필수) → 통계 분석 실행
 4. **원고 계획**: `docs/draft_plan_template.md`를 `drafts/draft_plan.md`로 복사 → 10개 항목 작성 (**Claim→Citation Mapping 포함**) (Opus 권장)
 5. **초안 작성**: `docs/drafting_protocol.md`를 따르고 권장 순서에 따라 섹션 작성
@@ -254,7 +256,7 @@ AI 산문의 흔적 — 피상적인 `-ing` "표면 분석" 절, AI가 선호하
 Reviewer response는 `docs/response_letter_template.md` 형식으로 작성하고, 각 원고 수정은 `[CHANGE]` block으로 기록합니다. 최종 response letter는 다음 명령으로 컴파일합니다:
 
 ```powershell
-py scripts\compile_response_docx.py drafts\revision\REV1\response_letter_REV1.md
+python3 scripts/compile_response_docx.py drafts/revision\REV1\response_letter_REV1.md
 ```
 
 compiler는 `Author_response_220803_Final.docx`의 house style을 재현합니다 — Times New Roman 11 pt, response/위치/수정문 줄은 bold, 본문은 justified. 이 .docx 파일을 템플릿으로 읽지 않으며, 서식은 코드에 내장되어 있습니다.
@@ -264,10 +266,10 @@ compiler는 `Author_response_220803_Final.docx`의 house style을 재현합니�
 MCP 없이 참고문헌을 검색할 수 있는 내장 Python 스크립트 (`scripts/search_pubmed.py`):
 
 ```bash
-py scripts\search_pubmed.py search "endoscopic spine surgery"  # 검색
-py scripts\search_pubmed.py fetch 35486828                     # PMID로 가져오기
-py scripts\search_pubmed.py doi 10.1016/j.spinee.2023.01.005  # DOI로 가져오기
-py scripts\search_pubmed.py related 35486828                   # 관련 논문
+python3 scripts/search_pubmed.py search "endoscopic spine surgery"  # 검색
+python3 scripts/search_pubmed.py fetch 35486828                     # PMID로 가져오기
+python3 scripts/search_pubmed.py doi 10.1016/j.spinee.2023.01.005  # DOI로 가져오기
+python3 scripts/search_pubmed.py related 35486828                   # 관련 논문
 ```
 
 Claude 통합 슬래시 명령어:
@@ -466,7 +468,7 @@ Copyright (c) 2026 박상민, 서울대학교 분당서울대학교병원
 
 - **Template-aware plan gate** — `scripts/hooks/enforce_gates.py`가 미완성 `analysis_plan.md` / `draft_plan.md` 템플릿이나 미체크 승인 항목을 승인된 plan으로 인정하지 않으며, `Write|Edit|MultiEdit` 모두에 적용됩니다. 정상적인 citation-style `[N]` 문구는 오탐하지 않도록 보수적으로 처리합니다.
 - **Fresh `/verify` gate check** — `scripts/verify_all.py`가 `--verify-hash`를 `check_gate.py`로 전달합니다. README/CLAUDE/slash-command 예시에 freshness 입력을 포함했습니다.
-- **Windows/template 정리** — PubMed 명령 예시는 `py scripts\search_pubmed.py`로 정리했고, 루트의 생성 DOCX 산출물은 ignore 처리했으며, hook과 freshness 전달 동작은 회귀 테스트로 보호합니다.
+- **Windows/template 정리** — PubMed 명령 예시는 `python3 scripts/search_pubmed.py`로 정리했고, 루트의 생성 DOCX 산출물은 ignore 처리했으며, hook과 freshness 전달 동작은 회귀 테스트로 보호합니다.
 
 ### v1.4.0 (2026-06-24)
 
@@ -606,7 +608,7 @@ Copyright (c) 2026 박상민, 서울대학교 분당서울대학교병원
 - `Style/style_guide.md` 추가: style-anchor 추출 규칙, PDF-to-MD mirror 규칙, publisher generic filename 처리 규칙.
 - `Style/terminology.md`를 spine surgery, trial, AI/radiomics, reporting context 전반의 preferred/forbidden terminology registry로 확장.
 - `docs/drafting_protocol.md`, `docs/section_templates.md` 추가: outline → evidence-bound draft → style pass → QC 작성 순서 강제.
-- `scripts/lint_manuscript.py` 추가 및 draft/table template 수정: Windows에서 `py scripts/lint_manuscript.py drafts --quiet` 통과.
+- `scripts/lint_manuscript.py` 추가 및 draft/table template 수정: Windows에서 `python3 scripts/lint_manuscript.py drafts --quiet` 통과.
 - `AGENTS.MD` 추가: agent bootstrap 지침이며 `CLAUDE.md`를 authoritative source of truth로 명시.
 - `.gitignore` 업데이트: 저작권 PDF와 private style-anchor summary는 local-only로 유지하고, 공개 workflow 파일과 예시는 commit 가능하게 정리.
 

@@ -10,5 +10,5 @@
 python-docx>=1.1.0   # DOCX compilation in scripts/compile_response_docx.py
 requests>=2.31.0     # OpenRouter calls in scripts/critical_review.py
 
-# Development / test runner (optional but recommended):
-# pytest>=8.0
+# Development / test runner:
+pytest>=8.0

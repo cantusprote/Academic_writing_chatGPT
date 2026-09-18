@@ -13,7 +13,7 @@ This repository is an academic manuscript-writing workflow. Treat `CLAUDE.md` as
 - Keep reference evidence under `knowledge/`; keep writing-style material under `Style/`.
 - Do not commit copyrighted PDFs or private/local style-anchor summaries.
 - Commit public workflow files such as `Style/style_guide.md`, `Style/terminology.md`, documentation, templates, and scripts when appropriate.
-- Cross-runtime review: from Codex (or any shell) you can pull in Claude's adversarial review with `py scripts/critical_review.py --target <file> --include-claude` (shells out to `claude -p`); OpenRouter models via `--models-file scripts/critical_models.txt`. See `docs/critical_review_protocol.md`.
+- Cross-runtime review: from Codex (or any shell) you can pull in Claude's adversarial review with `python3 scripts/critical_review.py --target <file> --include-claude` (shells out to `claude -p`); OpenRouter models via `--models-file scripts/critical_models.txt`. See `docs/critical_review_protocol.md`.
 
 ## Protected Local Files
 
@@ -29,13 +29,13 @@ Never stage or commit these unless the user explicitly overrides the rule:
 
 ## Manuscript Workflow
 
-- Do not run statistical analysis before an approved `analysis_plan.md` exists.
+- Do not run statistical analysis before an approved `analysis_plan.md` exists. For oncology projects, read `docs/oncology_analysis_guide.md` first; it overrides conflicting generic heuristics.
 - Do not draft manuscript sections before an approved `draft_plan.md` exists (run the Step 0 Socratic brainstorming in `docs/draft_plan_template.md` before filling it).
 - Draft sections in the order defined by `CLAUDE.md`: Methods, Results, Introduction, Discussion, Conclusion, Abstract, Title.
-- Apply terminology rules from `Style/terminology.md` during drafting and polishing.
+- Apply the breast oncology/translational terminology rules from `Style/terminology.md` during drafting and polishing.
 - Use `docs/drafting_protocol.md`, `docs/section_templates.md`, and `docs/writing_guide.md` for manuscript work.
-- Run the manuscript lint script with `py scripts/lint_manuscript.py drafts --quiet` on Windows.
-- Style transformation: when asked to make text academic/journal-style, follow `docs/style_transform_protocol.md` — load the bound `drafts/style_spec.md` + its exemplar and transform section-by-section. The auto-trigger/auto-lint hooks are Claude Code-only, so on Codex/shell run the measurable check explicitly (`py scripts/check_style.py check <section> --spec drafts/style_spec.md`) and the Style-Conformance verifier (`docs/verifier_prompt_templates.md`).
+- Run the manuscript lint script with `python3 scripts/lint_manuscript.py drafts --quiet` on macOS.
+- Style transformation: when asked to make text academic/journal-style, follow `docs/style_transform_protocol.md` — load the bound `drafts/style_spec.md` + its exemplar and transform section-by-section. The auto-trigger/auto-lint hooks are Claude Code-only, so on Codex/shell run the measurable check explicitly (`python3 scripts/check_style.py check <section> --spec drafts/style_spec.md`) and the Style-Conformance verifier (`docs/verifier_prompt_templates.md`).
 - Pass the verification gate after each produce step (Phase 3/4/8): dispatch the Constraint/Citation/Data/Logic verifier subagents **in parallel** against a frozen artifact per `docs/verification_protocol.md` (fix Constraint/spec violations first). Never proceed past a gate without a recorded `status: PASS` in `review/gates/`. On PASS, record a `provenance:` sha256 of the artifact (plus evidence/results where the gate depends on them; required for revision) and re-check freshness with `check_gate.py --verify-hash` — a changed file makes the PASS stale. For the deterministic dimensions (`citation` / `numbers` / `revision_claims`), also cross-check the ledger against a live re-run with `check_gate.py --cross-check LABEL=PATH` — a recorded `PASS` that disagrees with the live checker (stale or fabricated) fails the gate. On FAIL, fix and re-verify (max 2 retries) before escalating to the user.
 - Tag citations as `[EVID:author_year]` during drafting; do not cite evidence entries whose Source Status is `todo` (unverified). Use only numbers present in `results/*.csv`.
 - Complete and document mandatory QC rounds before final submission files are prepared.
@@ -46,4 +46,4 @@ Never stage or commit these unless the user explicitly overrides the rule:
 - Stage only intentional public workflow files and manuscript templates.
 - Verify no PDFs or private anchor summaries are staged before committing.
 - Do not rewrite history, amend commits, force-push, or revert user changes unless explicitly requested.
-- **Doc/version sync + auto commit-push (CLAUDE.md Rule 12):** any harness code/bug change must update the affected docs and bump the version (project header in CLAUDE.md + README.md/ko/ja/zh, the changed doc's own header, and a README changelog entry) in the same change, then auto-commit and push once tests are green — without asking. STOP and confirm first only when sensitive data could be staged, the change is large/destructive, manuscript WIP (`drafts/`) would be swept in, or history rewrite/force-push is involved.
+- **Git safety (CLAUDE.md Rule 12):** `upstream` is read-only. Never push to it. Keep code/docs synchronized; commit intentional changes only after tests pass. Push only to a user-owned `origin` when explicitly requested.

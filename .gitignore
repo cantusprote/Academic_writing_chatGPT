@@ -45,3 +45,6 @@ __pycache__/
 
 # Local archives/backups (not part of the workflow)
 *.zip
+
+# Local Python environment
+.venv/

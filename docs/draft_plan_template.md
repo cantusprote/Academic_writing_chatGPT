@@ -33,7 +33,16 @@
 - **목표 저널:**
 - **원고 유형:** Original Article / Review / Letter / …
 - **연구 설계:** RCT / Cohort / Cross-sectional / Case series / Meta-analysis / …
+- **질환/임상 setting (해당 시):** [breast cancer / other] — [early / neoadjuvant / adjuvant / metastatic / survivorship / other]
+- **Subtype / biomarker context (해당 시):** [HR+/HER2− / HER2+ / TNBC / HER2-low / molecular or translational subgroup / other]
+- **분석 대상/핵심 비교:** [population; intervention/exposure; comparator]
+- **Reporting guideline:** [CONSORT 2025 / STROBE / REMARK / NeoSTEEP / STEEP 2.0 / PRISMA / other as applicable; 복수 선택 가능]
 - **인용 형식:** `profile/journals.md` 확인 → [bracket / superscript / …], et al. after [N]명
+
+### Endpoint Definitions
+| Endpoint | Role | Operational Definition | Time Origin / Assessment Time | Event / Censoring (if TTE) |
+|---|---|---|---|---|
+| [endpoint] | Primary/Secondary/Exploratory | [RECIST/pCR/RCB/STEEP/other as applicable] | [time zero or assessment schedule] | [event/censoring] |
 
 ---
 
@@ -143,6 +152,7 @@
 
 > 몇 개, 각각 어떤 내용, Table vs Figure 결정.
 > 원칙: 동일 데이터를 Table과 Figure 모두에 제시하지 않음.
+> Oncology/translational 연구에서는 해당되는 경우 patient flow, treatment/exposure, efficacy, safety, survival, subgroup/interaction, pathology response, biomarker/ctDNA dynamics를 미리 배치한다. 모든 항목을 기계적으로 포함하지 말고 연구 질문에 필요한 것만 선택한다.
 
 | # | 제목 (가안) | 형식 | 내용 요약 |
 |---|-------------|------|-----------|
@@ -152,6 +162,8 @@
 | Fig 1 | | Figure | |
 | Fig 2 | | Figure | |
 | Supp Table 1 | | Supplementary | |
+
+**Oncology/translational candidates (해당 시):** patient flow; baseline disease/tumor characteristics; treatment exposure/discontinuation; RECIST waterfall/swimmer; pCR/RCB distribution; Kaplan–Meier or cumulative-incidence curves; subgroup/biomarker interaction forest plot; longitudinal ctDNA/biomarker dynamics with sampling times and evaluable denominators; safety with denominator/grading framework.
 
 ---
 
@@ -233,6 +245,7 @@
 - [ ] 4. Evidence gap — 추가 검색 완료 또는 필요 없음 확인
 - [ ] 5. Claim→Citation mapping — ~20개 claim에 citation 모두 확보 (`[EVID:id]` 형식, evidence.md 존재 확인)
 - [ ] 6. Table/Figure plan — 개수·형식·내용 결정
+- [ ] 질환 setting/subtype, endpoint operational definitions, reporting guideline 선택 완료
 - [ ] 7. Introduction outline — 단락별 흐름 설계
 - [ ] 8. Discussion outline — 논점 3–5개 + 비교 대상 확정
 - [ ] 9. Limitation points — 대응 논리 포함

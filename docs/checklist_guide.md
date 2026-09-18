@@ -84,7 +84,12 @@
 
 ---
 
-## CONSORT Checklist (Randomized Controlled Trials)
+## CONSORT 2025 Checklist (Randomized Controlled Trials)
+
+> **Use CONSORT 2025, not CONSORT 2010, as the authoritative checklist.** The official 2025 statement contains 30 items and supersedes CONSORT 2010. For oncology RCTs, also run `docs/oncology_checklist.md`. Key 2025 additions include data sharing, conflicts of interest, patient/public involvement, site/intervention-provider eligibility, harms ascertainment, explicit analysis populations and missing-data handling, intervention delivery/concomitant care, and open-science reporting.
+>
+> The compact table below is retained only as a navigation aid from the earlier template; its legacy item numbering must **not** be used as a substitute for the official CONSORT 2025 checklist.
+
 
 ### Title and Abstract
 | # | Item | Location | Level | Done |

@@ -20,5 +20,5 @@ Guidelines (see docs/writing_guide.md § 02. Abstract):
 ## Conclusions
 
 <!-- Keywords: REQUIRED. 3-6 terms, MeSH-preferred, semicolon-separated.
-     Example: lumbar spinal stenosis; decompression; patient-reported outcomes; minimal clinically important difference -->
+     Example: breast neoplasms; neoadjuvant therapy; pathologic complete response; biomarkers -->
 **Keywords:**

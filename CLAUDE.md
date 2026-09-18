@@ -1,9 +1,12 @@
-# Academic Paper Writing Project (v1.6.3)
+# Academic Paper Writing Project — Sim Oncology Custom (v0.1.0; upstream v1.6.3)
 
 ## Research Configuration
+**Primary Domain:** Breast Medical Oncology / Translational Research
 **Topic:** [INSERT YOUR SPECIFIC RESEARCH TOPIC]
+**Disease Setting:** [Early / Neoadjuvant / Adjuvant / Metastatic / Survivorship / Other]
+**Subtype / Biomarker Context:** [HR+/HER2- / HER2+ / TNBC / HER2-low / biomarker-defined / pan-breast]
 **Target Journal:** [INSERT TARGET JOURNAL]
-**Study Design:** [RCT / Cohort / Case-Control / Case Series / Meta-analysis / etc.]
+**Study Design:** [RCT / Prospective Cohort / Retrospective Cohort / Biomarker / Translational / Meta-analysis / etc.]
 
 > ⚠️ Update this section for each new paper project
 
@@ -26,7 +29,9 @@ project/
 │   ├── qc_guide.md               # Quality control & consistency verification
 │   ├── verification_protocol.md  # 검증 게이트·4 Verifier·자율 루프·게이트 원장
 │   ├── verifier_prompt_templates.md  # LLM semantic verifier prompts/output schema
-│   ├── statistical_analysis_guide.md  # Statistical analysis guide
+│   ├── statistical_analysis_guide.md  # Generic statistical analysis guide
+│   ├── oncology_analysis_guide.md     # Breast oncology endpoint/estimand/statistics override
+│   ├── oncology_checklist.md          # Oncology-specific Phase 6 reporting/QC checklist
 │   ├── evidence_guide.md         # Evidence 작성 가이드
 │   ├── revision_guide.md        # Revision & reviewer response guide
 │   ├── figure_guide.md          # Figure generation guide
@@ -138,7 +143,9 @@ project/
 | `docs/expert_roles.md` | Expert team descriptions | When drafting or reviewing (Phase 4-5) |
 | `docs/checklist_guide.md` | Study-type checklists (STROBE, CONSORT, PRISMA, CARE) | Phase 6 (QC) and before submission |
 | `docs/qc_guide.md` | Consistency & accuracy verification procedures | Phase 6 (QC rounds) |
-| `docs/statistical_analysis_guide.md` | Statistical methods, test selection, templates | Phase 2 (analysis) |
+| `docs/statistical_analysis_guide.md` | Generic statistical methods and templates | Phase 2 (analysis) |
+| `docs/oncology_analysis_guide.md` | **Primary statistical guide for oncology projects**; endpoint/estimand, survival, competing risks, biomarkers, ctDNA, multiplicity | Phase 2 and Phase 6 |
+| `docs/oncology_checklist.md` | Oncology-specific QC/reporting checklist (RCT, retrospective, neoadjuvant, metastatic, biomarker/ctDNA) | Phase 3 and Phase 6 |
 | `docs/evidence_guide.md` | Evidence 작성 가이드 (형식, 요약 방법, 워크플로우) | Phase 1 (setup) |
 | `docs/revision_guide.md` | Reviewer response guide (응답서 작성, 외교적 표현) | Revision (리뷰어 코멘트 수신 후) |
 | `docs/verification_protocol.md` | 검증 게이트·4 Verifier 헌장·자율 루프·게이트 원장 정의 | Phase 3·4·6·8 (게이트 수행 시 **반드시** 참조) |
@@ -209,6 +216,21 @@ project/
   3. Register in `knowledge/evidence.md` with summary & key points
   4. 핵심 논문은 `knowledge/summaries/`에 상세 요약 추가
   5. Then cite in manuscript
+
+### 1A. Oncology Method Override (Sim Custom)
+
+For breast oncology / translational projects, **`docs/oncology_analysis_guide.md` takes precedence over generic statistical heuristics** in `docs/statistical_analysis_guide.md` when they conflict. In particular:
+
+- Define the clinical question as **endpoint + estimand + analysis population + time origin + event/censoring/intercurrent-event rules** before choosing a test/model.
+- Do not choose parametric vs nonparametric methods from a normality-test p-value alone. Do not use the old `kstest(data, 'norm')` rule.
+- Do not choose multiplicity correction solely from the number of comparisons; define the hypothesis family and confirmatory/exploratory status first.
+- For time-to-event outcomes, predefine PH assessment and alternatives (time-varying effects, landmark estimates, RMST) when appropriate.
+- For competing events, use cumulative incidence and an estimand-appropriate cause-specific or subdistribution model rather than default Kaplan-Meier.
+- A biomarker is **predictive** only when treatment-effect heterogeneity is supported by an interaction analysis; significance in one subgroup and non-significance in another is insufficient.
+- Serial biomarkers/ctDNA require explicit sampling time, landmark/time-dependent handling, and immortal-time bias checks.
+- Use `docs/oncology_checklist.md` in addition to the general reporting checklist.
+
+---
 
 ### 2. Redundancy Prevention
 
@@ -439,19 +461,18 @@ These must match across **Abstract ↔ Methods ↔ Results ↔ Tables**:
   - 비용 여유가 있으면 Opus 사용이 더 좋은 결과를 냄
 - **핵심 원칙:** Plan은 Opus로 잘 잡고 → 작성은 Sonnet으로도 OK
 
-### 12. Documentation & Version Sync + Auto Commit-Push (문서·버전 동기화 + 자동 커밋·푸시)
+### 12. Documentation, Versioning & Git Safety (Sim Custom)
 
-> **harness(scripts/·hooks/·docs/) 코드·버그·기능 변경 시 항상: (1) 영향받는 문서 갱신 → (2) 버전 bump → (3) 자동 commit+push.** 매번 사용자에게 묻지 않는다.
+> Harness code/doc changes remain synchronized, but this custom fork must never push changes to the public upstream repository.
 
-**규칙:**
+**Rules:**
 
-- **문서 동기화 (코드 ↔ 문서 동시 변경):** 동작·CLI 플래그·스크립트를 바꾸면 **같은 변경 안에서** 관련 문서를 갱신한다 — `CLAUDE.md`(명령 예시·규칙), `docs/`(해당 protocol), `review/gates/_TEMPLATE.GATE.md`, `AGENTS.MD`, `README.md`/`.ko`/`.ja`/`.zh`(기능 bullet + changelog). **문서 없는 코드 변경 금지.**
-- **버전 bump (semver):**
-  - **프로젝트 버전** = `CLAUDE.md` 헤더 + README 4종 헤더(`**vX.Y.Z**`). **cadence 느리게:** 개별 스크립트/플래그 추가·개선·문서·버그는 **patch**(1.5.3→1.5.4). minor는 **큰 마일스톤**(여러 기능 묶음, phase 단위 신규 역량, 워크플로 구조 변경)에만. 호환성 깨짐 = major. 작은 기능 하나마다 minor 올리지 말 것.
-  - 변경된 **개별 doc**은 자체 헤더 semver도 올린다 (예: `verification_protocol.md` 0.2.0→0.3.0).
-  - README 4종 Changelog에 `### vX.Y.Z (YYMMDD)` 항목 추가 (오늘 날짜).
-- **자동 commit+push:** 변경이 **검증(테스트 green)되면** 사용자 확인 없이 commit + push 한다. 표준 커밋 메시지 형식 사용. protected 파일(`.gitignore`의 PDF/`profile/`/Style 앵커)은 자동 제외됨.
-- **STOP — 자동 push 금지, 먼저 확인:** ① 비공개/민감 데이터가 staged될 위험, ② 대규모 파괴적 변경, ③ 사용자 manuscript 본문(`drafts/` WIP)이 함께 휩쓸릴 때, ④ history 재작성·force-push·revert(명시 요청 시에만). 이 경우 멈추고 사용자에게 확인한다.
+- **Code ↔ docs together:** when changing harness behavior, CLI flags, hooks, or validation logic, update the affected documentation in the same change.
+- **Custom versioning:** use `Sim Oncology Custom vX.Y.Z`; keep the upstream base recorded separately (`upstream-v1.6.3`).
+- **Upstream is read-only:** remote `upstream` is only for `fetch`/comparison/merging. **Never push to `upstream`.**
+- **User remote:** when a personal GitHub repository is created, configure it as `origin`. Push only to `origin`, and only when the user explicitly asks or a user-approved automation requires it.
+- **Before commit/push:** inspect `git status`, `git diff`, tests, and ensure protected/private files are not staged.
+- **STOP:** do not auto-push when manuscript WIP, private data, PDFs, profile files, destructive changes, or history rewriting are involved.
 
 ---
 
@@ -495,12 +516,12 @@ Phase 1: Setup
 └── Read docs/writing_guide.md for target sections
 
 Phase 2: Statistical Analysis — Opus 권장 (analysis_plan)
-├── Read docs/statistical_analysis_guide.md (분석 설계 원칙·검정 선택·보정)
+├── Read docs/oncology_analysis_guide.md first for oncology projects; use docs/statistical_analysis_guide.md for generic background
 ├── Place raw data (CSV/XLSX) in data/
 ├── (선택) /paper-debate — 분석 접근을 통계 담당 공동 저자(Codex)와 토론 후 plan 작성
 ├── Create data/analysis_plan.md (필수, 사용자 승인 후 진행)
 │   ├── Claude reads CSV → creates analysis plan → 사용자 확인
-│   └── 포함 항목: endpoint hierarchy, 검정법, 다중비교 보정, 결측 처리
+│   └── 포함 항목: estimand, analysis population, endpoint/time origin/censoring, model, multiplicity, missing data, sensitivity
 ├── Generate Python scripts in data/py/
 │   ├── 01_descriptive.py (demographics, baseline)
 │   ├── 02_comparative.py (group comparisons)
@@ -556,7 +577,7 @@ Phase 5: Style Polish
 │   └── Hedging Language 적정성 확인
 ├── Apply docs/section_templates.md sentence-pattern pass
 ├── Apply Style/terminology.md terminology pass
-├── Run `py scripts/lint_manuscript.py drafts --quiet` on Windows and fix high-priority findings
+├── Run `python3 scripts/lint_manuscript.py drafts --quiet` on Windows and fix high-priority findings
 ├── Apply writing_guide.md Writing Principles (4 Pillars)
 │   └── Clarity / Conciseness / Objectivity / Consistency
 └── Expert: Dr. Editor (final polish)
@@ -572,7 +593,8 @@ Phase 6: QC (3 rounds CRITICAL, 6 rounds RECOMMENDED)
 ├── Round 6.5 (선택): Editorial desk-screen — /editor-review: high-impact 저널 편집장 관점 (임상 타당성·분야 scope fit·추가검증 roadmap·하위저널 추천; advisory, `docs/critical_review_protocol.md` §5)
 ├── Claim verification (선택): /verify-claims — 인용 문장별 SUPPORTED/PARTIAL/UNSUPPORTED 리포트 (docs/citation_assist_protocol.md; GraphRAG 주, evidence.md 보조)
 ├── Document all rounds in review/qc_log.md
-└── Run study-specific checklist (checklist_guide.md — CONSORT/STROBE/PRISMA/CARE)
+├── Run study-specific checklist (checklist_guide.md — CONSORT/STROBE/PRISMA/CARE)
+└── For oncology projects also run docs/oncology_checklist.md
 
 Phase 7: Finalize
 ├── Read docs/docx_guide.md (DOCX 변환 규칙 확인)
@@ -684,21 +706,22 @@ Phase 8: Revision (리뷰어 코멘트 수신 후)
 | Command | Action |
 |---------|--------|
 | `Run QC round [1-6]` | Execute specific QC round per qc_guide.md |
-| `Check number consistency` | `py scripts\check_numbers.py drafts\05_results.md drafts\table_1.md --results results` 실행 |
-| `Check abstract` | `py scripts\check_abstract.py drafts\04_methods.md drafts\05_results.md drafts\table_1.md drafts\table_2.md --abstract drafts\02_abstract.md` 실행 (abstract 수치가 본문에 다 있는지; Rule 3 일관성) |
-| `Check style` | `py scripts\check_style.py check drafts\05_results.md --spec drafts\style_spec.md` 실행 (Style Spec 대비 측정형 게이트) |
-| `Verify references` | `py scripts\check_citations.py drafts\03_introduction.md --evidence knowledge\evidence.md` 실행 |
-| `Check coverage` | `py scripts\check_coverage.py drafts\03_introduction.md drafts\06_discussion.md --evidence knowledge\evidence.md --draft-plan drafts\draft_plan.md` 실행 (과잉인용·미등록인용·인용밀도 리포트; uncited는 중립. 기본 advisory, `--fail-on-over-citation`·`--fail-on-unknown`로 게이트화, `--max-citations-per-sentence N`로 임계 조정) |
-| `Check phase gate` | `py scripts\check_gate.py review\gates\phase_04_draft.GATE.md --artifact drafts\05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts\05_results.md --cross-check citation=drafts\05_results.md --cross-check numbers=drafts\05_results.md --results results` 실행 (freshness + ledger↔live cross-check 포함) |
-| `/verify [artifacts]` | `py scripts\verify_all.py drafts\05_results.md --results results --evidence knowledge\evidence.md --gate review\gates\phase_04_draft.GATE.md --artifact drafts\05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts\05_results.md --cross-check citation=drafts\05_results.md --cross-check numbers=drafts\05_results.md` — citation+number+gate freshness+cross-check 일괄 검증 |
+| `Check number consistency` | `python3 scripts/check_numbers.py drafts/05_results.md drafts/table_1.md --results results` 실행 |
+| `Check abstract` | `python3 scripts/check_abstract.py drafts/04_methods.md drafts/05_results.md drafts/table_1.md drafts/table_2.md --abstract drafts/02_abstract.md` 실행 (abstract 수치가 본문에 다 있는지; Rule 3 일관성) |
+| `Check style` | `python3 scripts/check_style.py check drafts/05_results.md --spec drafts/style_spec.md` 실행 (Style Spec 대비 측정형 게이트) |
+| `Verify references` | `python3 scripts/check_citations.py drafts/03_introduction.md --evidence knowledge/evidence.md` 실행 |
+| `Check coverage` | `python3 scripts/check_coverage.py drafts/03_introduction.md drafts/06_discussion.md --evidence knowledge/evidence.md --draft-plan drafts/draft_plan.md` 실행 (과잉인용·미등록인용·인용밀도 리포트; uncited는 중립. 기본 advisory, `--fail-on-over-citation`·`--fail-on-unknown`로 게이트화, `--max-citations-per-sentence N`로 임계 조정) |
+| `Check phase gate` | `python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md --results results` 실행 (freshness + ledger↔live cross-check 포함) |
+| `/verify [artifacts]` | `python3 scripts/verify_all.py drafts/05_results.md --results results --evidence knowledge/evidence.md --gate review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md` — citation+number+gate freshness+cross-check 일괄 검증 |
 | `/suggest-citation [claim]` | claim에 맞는 `[EVID:id]` 출처 제안 (medical-kag GraphRAG 주, evidence.md 보조; `docs/citation_assist_protocol.md`) |
 | `/verify-claims [section]` | 인용 문장별 SUPPORTED/PARTIAL/UNSUPPORTED 리포트 → `review/claim_verification.md` (`extract_claims.py` + Semantic-Citation Verifier) |
 | `/cite-stance [claim/section]` | 인용이 claim을 지지/반박/언급인지 분류 (Discussion 균형·overclaim 가드; `docs/citation_assist_protocol.md`) |
-| `/evidence-table [topic/ids]` | 논문 비교표(included studies) 생성 (`scripts\evidence_table.py`; Discussion/PRISMA supplement) |
-| `Check crossrefs` | `py scripts\check_crossrefs.py drafts\05_results.md drafts\06_discussion.md` 실행 (본문 Table/Figure 참조 ↔ 실존 대조 — broken ref·미인용·순서; advisory 기본, `--fail-on-broken`·`--fail-on-unreferenced`·`--fail-on-order`로 게이트화) |
-| `Check abbreviations` | `py scripts\check_abbreviations.py drafts\02_abstract.md drafts\03_introduction.md drafts\04_methods.md drafts\05_results.md drafts\06_discussion.md` 실행 (약어 첫 사용 정의 — abstract/본문 scope 분리; advisory, `--allow ABB` 반복 지정·`--strict`) |
+| `/evidence-table [topic/ids]` | 논문 비교표(included studies) 생성 (`scripts/evidence_table.py`; Discussion/PRISMA supplement) |
+| `Check crossrefs` | `python3 scripts/check_crossrefs.py drafts/05_results.md drafts/06_discussion.md` 실행 (본문 Table/Figure 참조 ↔ 실존 대조 — broken ref·미인용·순서; advisory 기본, `--fail-on-broken`·`--fail-on-unreferenced`·`--fail-on-order`로 게이트화) |
+| `Check abbreviations` | `python3 scripts/check_abbreviations.py drafts/02_abstract.md drafts/03_introduction.md drafts/04_methods.md drafts/05_results.md drafts/06_discussion.md` 실행 (약어 첫 사용 정의 — abstract/본문 scope 분리; advisory, `--allow ABB` 반복 지정·`--strict`) |
 | `Check logic flow` | Verify narrative consistency |
 | `Run checklist for [study type]` | STROBE/CONSORT/PRISMA/CARE checklist |
+| `Run oncology checklist` | Apply `docs/oncology_checklist.md` (endpoint definitions, survival/response, biomarker/ctDNA, reporting) |
 
 ### Revision (after reviewer comments)
 | Command | Action |
@@ -707,9 +730,9 @@ Phase 8: Revision (리뷰어 코멘트 수신 후)
 | `Draft response to reviewer [N]` | 특정 리뷰어 응답서 초안 작성 |
 | `Draft response letter` | 전체 응답서 초안 작성 |
 | `Review response letter` | Dr. Editor 관점에서 응답서 검토 |
-| `Check response completeness` | `py scripts\check_revision_claims.py drafts\revision\REV1\response_letter_REV1.md --strict` 실행 |
-| `Check response coverage` | `py scripts\check_response_coverage.py drafts\revision\REV1\response_letter_REV1.md --comments review\reviewer_comments_REV1.md` 실행 (모든 리뷰어 코멘트에 실제 응답이 있는지 — 미응답·빈 응답·placeholder 차단) |
-| `Compile response letter` | `py scripts\compile_response_docx.py drafts\revision\REV1\response_letter_REV1.md` 실행 |
+| `Check response completeness` | `python3 scripts/check_revision_claims.py drafts/revision\REV1\response_letter_REV1.md --strict` 실행 |
+| `Check response coverage` | `python3 scripts/check_response_coverage.py drafts/revision\REV1\response_letter_REV1.md --comments review/reviewer_comments_REV1.md` 실행 (모든 리뷰어 코멘트에 실제 응답이 있는지 — 미응답·빈 응답·placeholder 차단) |
+| `Compile response letter` | `python3 scripts/compile_response_docx.py drafts/revision\REV1\response_letter_REV1.md` 실행 |
 
 ### Figures
 | Command | Action |
@@ -721,7 +744,7 @@ Phase 8: Revision (리뷰어 코멘트 수신 후)
 | Command | Action |
 |---------|--------|
 | `Compile manuscript` | Read `docs/docx_guide.md` → DOCX 변환 (규칙대로) |
-| `Format references for [journal]` | `py scripts\format_references.py drafts\03_introduction.md drafts\06_discussion.md --evidence knowledge\evidence.md --style numbered --convert` 실행 → 서지목록 + `*_formatted.md` (저널 스타일은 profile/journals.md 참조; MCP 독립). medical-kag 연결 시 `KAG references`로 KG 기반 포맷도 가능 |
+| `Format references for [journal]` | `python3 scripts/format_references.py drafts/03_introduction.md drafts/06_discussion.md --evidence knowledge/evidence.md --style numbered --convert` 실행 → 서지목록 + `*_formatted.md` (저널 스타일은 profile/journals.md 참조; MCP 독립). medical-kag 연결 시 `KAG references`로 KG 기반 포맷도 가능 |
 | `Generate submission checklist` | Pre-submission verification |
 
 ---
@@ -741,10 +764,10 @@ Phase 8: Revision (리뷰어 코멘트 수신 후)
 **CLI 직접 사용:**
 
 ```bash
-py scripts\search_pubmed.py search "query"           # 검색 (테이블 출력)
-py scripts\search_pubmed.py fetch <PMID> [PMID2...]  # PMID로 가져오기
-py scripts\search_pubmed.py doi <DOI>                # DOI로 가져오기
-py scripts\search_pubmed.py related <PMID>           # 관련 논문 검색
+python3 scripts/search_pubmed.py search "query"           # 검색 (테이블 출력)
+python3 scripts/search_pubmed.py fetch <PMID> [PMID2...]  # PMID로 가져오기
+python3 scripts/search_pubmed.py doi <DOI>                # DOI로 가져오기
+python3 scripts/search_pubmed.py related <PMID>           # 관련 논문 검색
 ```
 
 **옵션:**

@@ -6,7 +6,9 @@ A structured workflow system for academic medical paper writing using Claude AI.
 
 ## Version
 
-**v1.6.3** (2026-07-02)
+**Sim Oncology Custom v0.1.0** — based on upstream **v1.6.3** (2026-07-02)
+
+This fork preserves the upstream verification harness and adds a breast medical oncology/translational layer. See `docs/customization.md`, `docs/oncology_analysis_guide.md`, and `docs/oncology_checklist.md`.
 
 [![tests](https://github.com/grotyx/Academic_writing_c_claudecode/actions/workflows/tests.yml/badge.svg)](https://github.com/grotyx/Academic_writing_c_claudecode/actions/workflows/tests.yml)
 
@@ -143,7 +145,7 @@ project/
 ## Quick Start
 
 1. **Setup**: Update `CLAUDE.md` with your research topic, target journal, and study design. Check `profile/journals.md` for citation format and `Style/` for style anchors.
-2. **References**: Use `/search-evidence [query]` or `py scripts\search_pubmed.py` to search PubMed and register in `knowledge/evidence.md`
+2. **References**: Use `/search-evidence [query]` or `python3 scripts/search_pubmed.py` to search PubMed and register in `knowledge/evidence.md`
 3. **Data Analysis**: Place data in `data/` folder → create `analysis_plan.md` (required) → run statistical analysis
 4. **Draft Plan**: Copy `docs/draft_plan_template.md` → `drafts/draft_plan.md`, fill in all 10 items including **Claim→Citation Mapping** (Opus recommended)
 5. **Drafting**: Follow `docs/drafting_protocol.md` and write sections in recommended order (Methods → Results → Introduction → Discussion)
@@ -260,7 +262,7 @@ Improvements adapted from the "superpowers" skills framework, focused on the ver
 Reviewer responses should be drafted in `docs/response_letter_template.md` format, with each manuscript edit recorded as a `[CHANGE]` block. Final response letters can be compiled with:
 
 ```powershell
-py scripts\compile_response_docx.py drafts\revision\REV1\response_letter_REV1.md
+python3 scripts/compile_response_docx.py drafts/revision\REV1\response_letter_REV1.md
 ```
 
 The compiler reproduces the `Author_response_220803_Final.docx` house style — Times New Roman 11 pt, with bold response / location / revised-text lines and a justified body. It does not read that .docx file as a template; the formatting is built in.
@@ -270,10 +272,10 @@ The compiler reproduces the `Author_response_220803_Final.docx` house style — 
 Built-in Python script (`scripts/search_pubmed.py`) for reference search without MCP:
 
 ```bash
-py scripts\search_pubmed.py search "endoscopic spine surgery"  # Search
-py scripts\search_pubmed.py fetch 35486828                     # Import by PMID
-py scripts\search_pubmed.py doi 10.1016/j.spinee.2023.01.005  # Import by DOI
-py scripts\search_pubmed.py related 35486828                   # Related articles
+python3 scripts/search_pubmed.py search "endoscopic spine surgery"  # Search
+python3 scripts/search_pubmed.py fetch 35486828                     # Import by PMID
+python3 scripts/search_pubmed.py doi 10.1016/j.spinee.2023.01.005  # Import by DOI
+python3 scripts/search_pubmed.py related 35486828                   # Related articles
 ```
 
 Slash commands for Claude integration:
@@ -472,7 +474,7 @@ Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
 
 - **Template-aware plan gates** — `scripts/hooks/enforce_gates.py` now treats unresolved `analysis_plan.md` / `draft_plan.md` templates or unchecked approval boxes as not approved, applies to `Write|Edit|MultiEdit`, and avoids false positives for legitimate citation-style `[N]` text.
 - **Fresh `/verify` gate checks** — `scripts/verify_all.py` now forwards `--verify-hash` to `check_gate.py`; README/CLAUDE/slash-command examples include freshness inputs.
-- **Windows/template hygiene** — PubMed command examples use `py scripts\search_pubmed.py`, generated root-level DOCX artifacts are ignored, and regression tests cover the new hook and freshness-forwarding behavior.
+- **Windows/template hygiene** — PubMed command examples use `python3 scripts/search_pubmed.py`, generated root-level DOCX artifacts are ignored, and regression tests cover the new hook and freshness-forwarding behavior.
 
 ### v1.4.0 (2026-06-24)
 
@@ -589,10 +591,10 @@ Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
 - `[EVID:author_year]` citation tags and results-CSV-as-single-source grounding
 - Gate ledger (`review/gates/`) blocks progress until `status: PASS` is recorded
 - `evidence.md` entries gain a Source Status field; Phase 6 QC lightened to a final-confirmation pass
-- Programmatic citation checker: `py scripts\check_citations.py drafts\03_introduction.md --evidence knowledge\evidence.md`
-- Programmatic number checker: `py scripts\check_numbers.py drafts\05_results.md drafts\table_1.md --results results`
-- Programmatic phase gate checker: `py scripts\check_gate.py review\gates\phase_04_draft.GATE.md --artifact drafts\05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts\05_results.md`
-- Programmatic ghost-revision checker: `py scripts\check_revision_claims.py drafts\revision\REV1\response_letter_REV1.md --strict`
+- Programmatic citation checker: `python3 scripts/check_citations.py drafts/03_introduction.md --evidence knowledge/evidence.md`
+- Programmatic number checker: `python3 scripts/check_numbers.py drafts/05_results.md drafts/table_1.md --results results`
+- Programmatic phase gate checker: `python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md`
+- Programmatic ghost-revision checker: `python3 scripts/check_revision_claims.py drafts/revision\REV1\response_letter_REV1.md --strict`
 - LLM semantic verifier schema: `docs/verifier_prompt_templates.md` for logic, redundancy, semantic citation support, and revision-response alignment
 
 ### v0.8.1 (2026-06-16)
@@ -617,7 +619,7 @@ Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
 - Added `Style/style_guide.md` for style-anchor extraction rules, PDF-to-MD mirror rules, and publisher generic filename handling.
 - Expanded `Style/terminology.md` into the project terminology registry for preferred/forbidden terms across spine surgery, trials, AI/radiomics, and reporting contexts.
 - Added `docs/drafting_protocol.md` and `docs/section_templates.md` to enforce outline → evidence-bound draft → style pass → QC drafting.
-- Added `scripts/lint_manuscript.py` and updated draft/table templates so manuscript linting passes with `py scripts/lint_manuscript.py drafts --quiet` on Windows.
+- Added `scripts/lint_manuscript.py` and updated draft/table templates so manuscript linting passes with `python3 scripts/lint_manuscript.py drafts --quiet` on Windows.
 - Added `AGENTS.MD` as agent bootstrap instructions, with `CLAUDE.md` as the authoritative source of truth.
 - Updated `.gitignore` so copyrighted PDFs and private style-anchor summaries remain local, while public workflow files and examples remain commit-eligible.
 

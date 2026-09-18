@@ -1,5 +1,7 @@
 # Section-by-Section Writing Guide (v0.5.1)
 
+> **Sim oncology custom note:** this upstream guide intentionally retains some legacy spine/surgical examples because they illustrate generic writing patterns and keeping them minimizes upstream merge conflicts. For breast oncology terminology and endpoint language, `Style/terminology.md`, `docs/oncology_analysis_guide.md`, and the project-specific `drafts/draft_plan.md` take precedence. Do not copy a spine-specific example into an oncology manuscript.
+
 ## General Principles
 - Use past tense for completed actions (Methods, Results)
 - Use present tense for established facts and conclusions
