@@ -1,12 +1,10 @@
-> Action purpose: 논문들을 항목별 비교표(included studies)로 — Discussion/PRISMA supplement (GraphRAG 주, evidence.md 보조)
+> Action purpose: verified literature를 구조화된 비교표로 정리
 
-
-**언제 사용:** Discussion 비교 작성 또는 systematic review의 "included studies" 표 산출.
+**언제 사용:** Discussion 비교 작성 또는 review supplement.
 
 `docs/citation_assist_protocol.md` Operation 4를 따른다.
 
-대상: **[user-specified target/options]** (주제 또는 `[EVID:id]` 목록)
-
-1. **구조화 데이터 수집:** KAG 주 — medical-kag `analyze` 필드 / `compare_interventions`(design·n·intervention·outcome·effect·p·근거수준). evidence.md 보조(요약 기반, 거침).
-2. **JSON 레코드 → 표:** `python3 scripts/evidence_table.py <records.json> --columns study,design,n,intervention,outcome,result,loe`.
-3. **저장:** `drafts/table_evidence.md`(또는 supplement). **모든 수치는 원문 대조**(grounding — KAG 값은 빈/노이즈 가능, evidence.md/results가 정본).
+1. `knowledge/evidence.md`와 검증된 source paper에서 study/design/n/model or population/intervention/outcome/result/evidence level을 수집한다.
+2. domain-matched optional extraction backend는 속도를 높이는 용도로만 사용하며, manuscript-facing 수치는 원문 대조한다.
+3. `python3 scripts/evidence_table.py <records.json> --columns study,design,n,intervention,outcome,result,loe`로 표를 만든다.
+4. `drafts/table_evidence.md` 또는 적절한 supplement에 저장한다.

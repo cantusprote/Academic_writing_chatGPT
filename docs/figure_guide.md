@@ -1,6 +1,24 @@
-# Figure Generation Guide (v0.3.0)
+# Figure Generation Guide (v0.4.0)
 
-> 저널 제출용 고품질 Figure 생성을 위한 가이드
+> 저널 제출용 고품질 Figure 생성을 위한 **production/export** 가이드. Basic/mechanistic paper에서 figure의 scientific claim, panel 역할, main-vs-supplement 배치는 먼저 `docs/figure_story_guide.md`와 `drafts/story_map.md`에서 확정한다.
+
+---
+
+## 0. Scientific Architecture Before Plotting
+
+Basic/mechanistic figure를 그리기 전에 반드시 다음을 확인한다:
+
+- figure-level scientific question
+- one dominant claim (strong planning default)
+- anchor/decisive panel
+- each panel's inferential role
+- independent experimental unit and replicate hierarchy
+- decisive control/falsifier
+- claim boundary
+- main vs supplement destination
+- next scientific question generated
+
+`docs/figure_story_guide.md`가 scientific architecture의 정본이며, 이 문서는 그 다음 단계인 visual design, plotting, file format, resolution, export를 담당한다.
 
 ---
 
@@ -313,6 +331,9 @@ Abbreviations: [약어 정의]
 ## 체크리스트
 
 ### Figure 생성 시
+- [ ] Basic/mechanistic이면 `story_map.md`의 dominant claim과 panel role이 먼저 확정됐는가?
+- [ ] 각 panel이 distinct inference를 추가하는가, 아니면 같은 결과를 다른 방식으로 반복하는가?
+- [ ] independent `n`과 biological/technical replicate가 legend에서 추적 가능한가?
 - [ ] 최종 출판 크기로 생성했는가?
 - [ ] 폰트가 7pt 이상인가?
 - [ ] 색맹 친화 팔레트를 사용했는가?
@@ -327,6 +348,8 @@ Abbreviations: [약어 정의]
 - [ ] 파일명이 fig_1, fig_2 순서인가?
 
 ### 제출 전
+- [ ] Figure-level claim ↔ Results subsection ↔ legend의 claim strength가 일치하는가?
+- [ ] 결론을 바꾸는 negative/boundary result가 단지 narrative 편의를 위해 supplement로 숨겨지지 않았는가?
 - [ ] Figure legend가 독립적으로 이해 가능한가?
 - [ ] 모든 약어가 legend에 정의되어 있는가?
 - [ ] 본문에서 모든 Figure가 순서대로 언급되었는가?

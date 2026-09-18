@@ -258,14 +258,15 @@ Citation  First Appears In    Position    Number Correct?
 - Results에 불필요한 인용 (결과 섹션은 보통 최소한의 인용)
 - 특정 저자/그룹의 논문에 과도하게 의존 (self-citation 포함)
 
-**Self-citation Check:**
-- [ ] Self-citation 비율이 전체의 20% 이하인가?
-- [ ] Self-citation이 내용상 필수적인가? (불필요한 자기 인용 제거)
+**Self-citation / Author-concentration Check:**
+- [ ] 특정 저자/그룹(자기 인용 포함)에 불필요하게 의존하지 않았는가?
+- [ ] 각 self-citation이 실제 claim/context에 필요하며 더 적절한 독립 근거를 배제하지 않는가?
+- [ ] 비율 자체를 임의 cutoff로 PASS/FAIL하지 않고 relevance와 field coverage를 판단했는가?
 
-**Recency Check:**
-- [ ] 최근 5년 이내 문헌이 전체의 50% 이상인가?
-- [ ] 해당 분야의 최신 주요 논문이 누락되지 않았는가?
-- [ ] 고전적 reference (>10년)는 꼭 필요한 것만 포함했는가?
+**Recency / Foundational Coverage Check:**
+- [ ] 해당 분야의 최신 field-changing/major evidence가 누락되지 않았는가?
+- [ ] foundational/classic evidence가 연도만 오래됐다는 이유로 제거되지 않았는가?
+- [ ] 최신 문헌 비율을 임의 cutoff로 PASS/FAIL하지 않고 현재성, 중요도, 상반된 근거 coverage를 판단했는가?
 
 ---
 
@@ -363,7 +364,7 @@ Conclusion이 Results에 의해 지지되는지 확인
 
 본문의 "Table N"/"Figure N" 언급이 실제 존재하는 table/figure와 일치하는지 결정적으로 대조한다 (advisory). Revision에서 table 번호를 바꾸거나 삭제하면 본문 참조가 조용히 깨진다 — desk reject 단골 사유.
 
-```powershell
+```bash
 python3 scripts/check_crossrefs.py drafts/05_results.md drafts/06_discussion.md
 ```
 
@@ -406,7 +407,7 @@ python3 scripts/check_crossrefs.py drafts/05_results.md drafts/06_discussion.md
 
 **결정적 보조 (`scripts/check_abbreviations.py`, advisory):**
 
-```powershell
+```bash
 python3 scripts/check_abbreviations.py drafts/02_abstract.md drafts/03_introduction.md drafts/04_methods.md drafts/05_results.md drafts/06_discussion.md
 ```
 
@@ -582,8 +583,8 @@ Q6: Missing data가 결과에 영향을 줄 수 있는가?
 | Methods | | | |
 | Results | | | |
 | Discussion | | | |
-| Self-citation rate | | | ≤20%? |
-| Recent (≤5yr) rate | | | ≥50%? |
+| Author/self-citation concentration | | | relevance / unnecessary concentration? |
+| Recent + foundational coverage | | | current major evidence and key foundational work covered? |
 
 ### Summary:
 - References checked: X/X

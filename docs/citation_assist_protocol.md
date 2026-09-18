@@ -1,94 +1,72 @@
-# Citation Assist Protocol (GraphRAG-backed)
+# Citation Assist Protocol
 
-> Two evidence operations that speed and harden citation work — citation **suggestion**
-> and a per-claim **verification report** — backed by the medical-kag knowledge graph
-> (GraphRAG) when available, falling back to `knowledge/evidence.md` when it is not.
+> Evidence operations for citation suggestion, claim verification, citation stance, and study-comparison tables. `knowledge/evidence.md` is always the canonical citation ledger.
 
-## Backend rule (grounding preserved)
+## Backend and domain-routing rule
 
-- **Primary:** medical-kag MCP (GraphRAG) — semantic retrieval over the graph.
-- **Fallback:** `knowledge/evidence.md` (+ `scripts/search_pubmed.py` for new sources) when the
-  MCP is unavailable (the remote session can be flaky; see `docs/medical_kag_protocol.md`).
-- **Canonical ledger unchanged:** `knowledge/evidence.md` is the only source of `[EVID:id]`.
-  Anything the graph surfaces is registered there (PMID/DOI verified) **before** it becomes a
-  citable `[EVID:id]`. `scripts/check_citations.py` still gates.
+1. **Start with `knowledge/evidence.md`.** Reuse verified registered evidence when it supports the claim.
+2. **For new biomedical evidence, use PubMed-first discovery** via `chatgpt/actions/search-evidence.md` / `scripts/search_pubmed.py` (and other user-authorized biomedical sources when explicitly available).
+3. **`medical-kag-remote` is optional and domain-limited.** The bundled protocol describes a spine-surgery graph. Use it only when the project/topic actually matches that graph or the user explicitly requests it. Do **not** make it the primary retrieval route for breast oncology, tumor biology, or general basic/translational research.
+4. Anything newly surfaced by any retrieval backend becomes citable only after PMID/DOI/source verification and registration in `knowledge/evidence.md` as `[EVID:id]`.
+5. Retrieval systems never replace source-paper verification for exact claims or literature numbers.
 
 ---
 
-## Operation 1 — Citation suggestion (`/suggest-citation [claim]`)
+## Operation 1 — Citation suggestion
 
-Goal: given a draft claim that needs support, propose the best `[EVID:id]` candidate(s).
+Goal: given a draft claim, propose verified `[EVID:id]` candidates.
 
-1. **Retrieve (KAG primary):** medical-kag `search` action `evidence`/`evidence_chain`/
-   `best_evidence` (or `search`) on the claim → candidate papers, ranked, with evidence level.
-2. **Fallback (KAG down):** scan `knowledge/evidence.md` for entries whose summary/key points
-   match the claim; if nothing fits, `python3 scripts/search_pubmed.py search "<claim terms>"` for new
-   candidates.
-3. **Register before citing:** for any candidate not yet in `evidence.md`, register it as
-   `[EVID:author_year]` (verify PMID/DOI) per `docs/evidence_guide.md`.
-4. **Output:** ranked `[EVID:id]` candidates, each with a one-line reason it supports the claim
-   (direction / population / intervention / outcome). The author picks — do not auto-insert silently.
+1. Scan `knowledge/evidence.md` for already-verified candidates.
+2. If coverage is inadequate, search PubMed with claim-specific terms and study-type filters as appropriate.
+3. If a domain-matched optional evidence backend exists (including the legacy spine medical-KAG), it may be used as an additional discovery/conflict source, not as the citation ledger.
+4. Register any new candidate in `knowledge/evidence.md` after verifying identity/source.
+5. Output candidate `[EVID:id]` values with a one-line support explanation (direction, population/model, intervention/exposure, outcome). Do not silently insert a citation.
 
-Use in Phase 3 (claim→citation mapping, Rule 8) and Phase 4 (drafting).
+Use in Phase 3 claim→citation mapping and Phase 4 drafting.
 
 ---
 
-## Operation 2 — Claim-verification report (`verify-claims [section]`)
+## Operation 2 — Claim-verification report
 
-Goal: a per-sentence "claim map" — is each cited sentence actually supported by its evidence?
+Goal: determine whether each cited sentence is actually supported by its registered source.
 
-1. **Extract claims (deterministic):** `python3 scripts/extract_claims.py <section> --json` → each
-   `[EVID:id]`-tagged sentence.
-2. **Retrieve evidence:** for each claim's `[EVID:id]`, pull the source content — medical-kag
-   (KAG primary: the paper's structured data / chunks) or the `evidence.md` entry (fallback).
-3. **Classify (NLI / Semantic-Citation Verifier):** run the Semantic-Citation Verifier
-   (`docs/verifier_prompt_templates.md`) on (sentence, evidence) → `SUPPORTED` / `PARTIAL` /
-   `UNSUPPORTED` (entailment / partial / not-supported-or-contradicted), with a one-line reason
-   and required action.
-4. **Report:** write `review/claim_verification.md` — a table of `location | claim | [EVID:id] |
-   verdict | action`. Any `UNSUPPORTED`/`PARTIAL` is a fix item (weaken the claim, change the
-   citation, or register better evidence).
+1. Extract `[EVID:id]` claims with `python3 scripts/extract_claims.py <section> --json`.
+2. Retrieve the corresponding `knowledge/evidence.md` entry and, for important/ambiguous claims, the verified source paper/abstract/full text available to the workflow.
+3. Run the Semantic-Citation Verifier in `docs/verifier_prompt_templates.md`.
+4. Classify as `SUPPORTED`, `PARTIAL`, or `UNSUPPORTED` (or not enough information where the verifier schema calls for it).
+5. Save `review/claim_verification.md` with `location | claim | [EVID:id] | verdict | action`.
 
-Use as a **Phase 6 QC round** (claim-level grounding), complementing the deterministic
-`check_citations.py` (existence) and the inline Phase-4 draft gates.
+A graph/KAG may supply supplementary context only when domain-matched; it is not required for verification.
 
 ---
 
-## Operation 3 — Citation stance (`인용이 균형적인지 봐줘`)
+## Operation 3 — Citation stance / balance
 
-Goal: tag how each cited source relates to a claim — supporting / contrasting / mentioning —
-so the Discussion stays balanced (Scite-style, claim-specific).
+Goal: classify each source as supporting, contrasting, or mentioning a claim and identify one-sided literature framing.
 
-1. **Identify** the claim(s) and their `[EVID:id]` (`scripts/extract_claims.py` for a whole section).
-2. **Retrieve + find contrasts:** pull each source (KAG primary, evidence.md fallback); use
-   medical-kag `conflict find/detect` to surface contrasting studies that may be missing.
-3. **Classify** each source with the Citation-Stance verifier (`docs/verifier_prompt_templates.md`):
-   supporting / contrasting / mentioning + reason.
-4. **Output** a stance summary; flag **one-sided** if contrasting evidence exists but is not
-   cited (overclaim-by-omission guard). Use when writing or QC-ing the Discussion.
+1. Identify the claim and registered `[EVID:id]` sources.
+2. Classify stance from the verified evidence/source material.
+3. Search PubMed for plausible conflicting/contrasting evidence when the claim is important or contested.
+4. A domain-matched conflict/graph tool may supplement this search, but absence of that tool must not block the audit.
+5. Flag one-sided framing when material contrasting evidence exists but is omitted without justification.
 
 ---
 
-## Operation 4 — Evidence comparison table (`근거 비교표 만들어줘`)
+## Operation 4 — Evidence comparison table
 
-Goal: a "summary of included studies" table (Elicit-style) for the Discussion or a PRISMA
-supplement.
+Goal: produce a structured comparison of selected papers for a Discussion or review supplement.
 
-1. **Gather structured records** for the target papers — KAG primary (`analyze` fields /
-   `compare_interventions`: design, n, intervention, outcome, effect, p, evidence level);
-   evidence.md fallback (from the entry summaries; rougher).
-2. **Format:** emit JSON records, then `python3 scripts/evidence_table.py <records.json> --columns
-   study,design,n,intervention,outcome,result,loe` → a markdown table.
-3. **Save** to `drafts/table_evidence.md` (or a supplement). Verify every number against the
-   source (grounding) — KAG values can be sparse/noisy; `evidence.md` / `results` are canonical.
+1. Gather structured fields from verified `knowledge/evidence.md` entries and the source papers as needed: study/design, n, model/population, intervention/exposure, outcome, result/effect, evidence level.
+2. Optional domain-matched extraction tools may accelerate this step, but every manuscript-facing number must be checked against the source paper.
+3. Format records with `python3 scripts/evidence_table.py <records.json> --columns study,design,n,intervention,outcome,result,loe`.
+4. Save to `drafts/table_evidence.md` or the appropriate supplement.
 
 ---
 
 ## Guardrails
 
-- Never invent a citation to satisfy a claim — if nothing supports it, weaken or flag the claim
-  (CHATGPT.md Rule 1 + STOP signals).
-- KAG is discovery/analysis; `evidence.md` stays canonical. Verify KAG numbers from the source
-  (`evidence.md` / `results`) before they enter the manuscript.
-- Both operations degrade gracefully: with no MCP, `evidence.md` + `search_pubmed.py` keep them
-  fully functional.
+- Never invent a citation to satisfy a claim.
+- `knowledge/evidence.md` is the canonical citation registry; retrieval backends are discovery aids.
+- Literature numbers come from the cited source paper/evidence record, not from the study's `results/*.csv` unless they are results of the current study.
+- The current study's own result values remain grounded in `results/*.csv`.
+- If a retrieval backend is unavailable or domain-mismatched, continue with evidence.md + PubMed rather than blocking the workflow.

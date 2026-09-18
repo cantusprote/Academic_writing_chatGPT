@@ -23,4 +23,20 @@ Or use the combined helper when appropriate:
 python3 scripts/verify_all.py <artifacts> --results results --evidence knowledge/evidence.md [gate options]
 ```
 
-After deterministic checks, run the semantic Constraint/Citation/Data/Logic verifier passes defined in `docs/verification_protocol.md`. Only then record `status: PASS` with provenance.
+After deterministic checks, run the semantic Constraint/Citation/Data/Logic verifier passes defined in `docs/verification_protocol.md`.
+
+For **basic/mechanistic** projects, a full `chatgpt/actions/audit-mechanism.md` is mandatory at **Phase 3** and **Phase 6**. During Phase 4, rerun it only when the drafted artifact changes or materially reinterprets the central claim, story-map architecture, experimental unit, figure-level mechanism, or another premise underlying the prior mechanism PASS. Record `checks.mechanism: PASS` only when that audit was actually required and performed; `FAIL` or `BLOCKED` must keep the relevant gate from passing.
+
+Only then record `status: PASS` with provenance.
+
+
+## Basic/mechanistic Phase 3 story gate
+
+```bash
+python3 scripts/check_gate.py review/gates/phase_03_story.GATE.md \
+  --artifact drafts/story_map.md \
+  --require-check mechanism \
+  --verify-hash artifact=drafts/story_map.md
+```
+
+The mechanism dimension is semantic, so it has no deterministic `--cross-check` yet. Freshness is enforced by provenance hashes; if the story map or reviewed supporting artifact changes, rerun the audit.

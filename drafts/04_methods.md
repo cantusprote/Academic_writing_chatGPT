@@ -1,4 +1,5 @@
 # Methods
+<!-- Clinical-default skeleton. For Basic-Mechanistic/Hybrid projects, use `drafts/_templates/basic_methods.md` and `docs/basic_section_templates.md` instead. -->
 
 <!--
 Guidelines (see docs/writing_guide.md):

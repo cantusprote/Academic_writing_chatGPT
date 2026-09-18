@@ -65,14 +65,14 @@ DOCX formatting applied by the compiler:
 
 Compile command:
 
-```powershell
-python3 scripts/check_revision_claims.py drafts/revision\REV1\response_letter_REV1.md --strict
+```bash
+python3 scripts/check_revision_claims.py drafts/revision/REV1/response_letter_REV1.md --strict
 ```
 
 If this prints `GATE PASS`, generate the DOCX:
 
-```powershell
-python3 scripts/compile_response_docx.py drafts/revision\REV1\response_letter_REV1.md
+```bash
+python3 scripts/compile_response_docx.py drafts/revision/REV1/response_letter_REV1.md
 ```
 
 The default output is `output/revision/REV1/response_letter_REV1_YYMMDD.docx`

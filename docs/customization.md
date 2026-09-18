@@ -3,7 +3,7 @@
 ## Baseline
 
 - Custom project: `Academic_writing_chatGPT`
-- Custom version: `v0.2.0`
+- Custom version: `v0.3.0`
 - Upstream repository: `grotyx/Academic_writing_c_claudecode`
 - Upstream baseline: **v1.6.3**, commit `e0527e2`
 - Local tag preserving the baseline: `upstream-v1.6.3`
@@ -53,6 +53,13 @@ This fork is operated from ChatGPT. Local file work is performed through **sSb o
 - Never push to `upstream`.
 - Sync upstream by `git fetch upstream` and review changes before merging/rebasing.
 
+
+### Basic / Mechanistic Research Layer (v0.3.0)
+
+The fork now supports wet-lab/basic/preclinical manuscript work in addition to clinical oncology. `docs/basic_research_analysis_guide.md` routes analysis around the true experimental unit, replicate hierarchy, planned contrast, batch/block/repeated structure, and effect estimate. `drafts/story_map.md` is the scientific-architecture source of truth for substantial mechanistic papers, with claim-strength and reproducibility audits at Phase 3 and Phase 6. Basic-specific Methods/Results templates prevent the workflow from falling back to patient-flow/primary-endpoint clinical structure.
+
+Citation retrieval is domain-aware: `knowledge/evidence.md` remains canonical, PubMed-first discovery is the default for breast/basic biomedical work, and the bundled spine medical-KAG is optional only for domain-matched projects.
+
 ## Intentional Legacy Examples
 
-`docs/writing_guide.md` and `docs/statistical_analysis_guide.md` retain some upstream spine/surgical examples to reduce future merge conflicts. They are examples only. Oncology terminology and methodology are governed by `Style/terminology.md` and `docs/oncology_analysis_guide.md`.
+`docs/writing_guide.md` and `docs/statistical_analysis_guide.md` retain some upstream spine/surgical examples to reduce future merge conflicts. They are examples only. Oncology terminology and methodology are governed by `Style/terminology.md` and `docs/oncology_analysis_guide.md`. `docs/medical_kag_protocol.md` is separately retained as an **optional legacy spine-domain integration** and must not be used as the primary evidence route for breast oncology/basic biomedical work.

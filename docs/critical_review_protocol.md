@@ -55,6 +55,6 @@
   - Shellby independent review = sSb/mSb fresh-context reviewer (가능한 경우).
   - OpenRouter = `python3 scripts/critical_review.py --target <file> --role editor --models <…>`.
   - 즉 모델 풀·선택 방식은 §1·§2의 reviewer 검토와 같고, 프롬프트만 `editor.txt`다.
-- **벤치마크 강화(선택):** medical-kag MCP 연결 시 `search`/`compare_interventions`/`best_evidence`로 해당 분야 high-impact 문헌의 설계·n·근거수준을 끌어와 근거화. 미연결 시 LLM 지식 + `search_pubmed.py`.
+- **벤치마크 강화(선택):** `knowledge/evidence.md`와 PubMed/search를 기본으로 해당 분야 high-impact 문헌을 확인한다. Bundled medical-kag는 spine-domain match일 때만 optional 보조로 사용한다; breast/basic oncology의 기본 벤치마크 도구로 사용하지 않는다.
 - **성격:** grounded 게이트가 **아니라** 판정형 평가(임상·분야 지식 사용). **advisory** — 게이트를 대체하지 않는다. 수치·인용 grounding은 여전히 `check_numbers`/`check_citations` 담당. Phase 6에서 사용.
 - 에러·폴백은 §4와 동일.

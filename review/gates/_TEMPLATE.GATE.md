@@ -49,15 +49,15 @@ Mechanism:
 1. When the gate passes, record the sha256 of each source-of-truth file under `provenance:`.
    Compute hashes with the built-in helper:
 
-   ```powershell
+   ```bash
    python3 scripts/check_gate.py --compute-hash drafts/05_results.md
    ```
 
 2. At gate-check time, re-hash and compare with `--verify-hash LABEL=PATH` (repeatable). A
    changed file fails the gate as a **stale gate**, forcing re-verification:
 
-   ```powershell
-   python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md
+   ```bash
+   python3 scripts/check_gate.py review/gates/phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md
    ```
 
 The `--verify-hash` flag is opt-in at the **tool** level (omit it and the gate behaves exactly as
@@ -78,6 +78,7 @@ Use these exact keys so `check_gate.py --require-check <name>` can verify them:
 | `citation` | `scripts/check_citations.py` plus semantic citation verifier when needed |
 | `numbers` | `scripts/check_numbers.py` |
 | `logic` | Logic/redundancy verifier |
+| `mechanism` | `chatgpt/actions/audit-mechanism.md` semantic overlay (basic/mechanistic only) |
 | `revision_claims` | `scripts/check_revision_claims.py` |
 | `response_alignment` | reviewer response vs manuscript alignment verifier |
 
@@ -99,18 +100,33 @@ ledger) fails too.
 tool level (backward compatible) but **standard practice** at the workflow level — the
 gate commands below include it.
 
+## Basic / Mechanistic Story Gate
+
+For Phase 3 basic/mechanistic projects, record `checks.mechanism: PASS` only after `chatgpt/actions/audit-mechanism.md` has reviewed the frozen story map and supporting artifacts. The ledger top-level status remains `FAIL` while the mechanism audit is `FAIL` or `BLOCKED`.
+
+Example:
+
+```bash
+python3 scripts/check_gate.py review/gates/phase_03_story.GATE.md \
+  --artifact drafts/story_map.md \
+  --require-check mechanism \
+  --verify-hash artifact=drafts/story_map.md
+```
+
+For multi-paper projects, use the matching paper-specific `story_map.md`, review folder, and provenance path.
+
 ## Command Examples
 
 Draft section gate (freshness + cross-check — `results` because this section carries numbers):
 
-```powershell
-python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --verify-hash results=results/table2_outcomes.csv --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md --results results
+```bash
+python3 scripts/check_gate.py review/gates/phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --verify-hash results=results/table2_outcomes.csv --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md --results results
 ```
 
 Revision gate (evidence + results freshness required — a revision round changes both):
 
-```powershell
-python3 scripts/check_gate.py review/gates\phase_08_revision.GATE.md --require-check constraint --require-check revision_claims --require-check response_alignment --require-check citation --require-check numbers --verify-hash artifact=drafts/revision\REV1\05_results_REV1.md --verify-hash evidence=knowledge/evidence.md --verify-hash results=results/table2_outcomes.csv --cross-check revision_claims=drafts/revision\REV1\response_letter_REV1.md
+```bash
+python3 scripts/check_gate.py review/gates/phase_08_revision.GATE.md --require-check constraint --require-check revision_claims --require-check response_alignment --require-check citation --require-check numbers --verify-hash artifact=drafts/revision/REV1/05_results_REV1.md --verify-hash evidence=knowledge/evidence.md --verify-hash results=results/table2_outcomes.csv --cross-check revision_claims=drafts/revision/REV1/response_letter_REV1.md
 ```
 
 ## FAIL Example

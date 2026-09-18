@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Verify manuscript numbers against results CSV files.
 
-This is the deterministic first gate for data grounding. It checks that
+This is the deterministic first gate for result-value grounding. It checks that
 result-like numbers in Markdown artifacts can be traced to numeric values in
-`results/*.csv`. It does not judge whether the surrounding interpretation is
-correct; that remains a reviewer/verifier task.
+`results/*.csv`. Clear experimental-design constants (for example dose/time or
+explicit replicate counts) are not treated as result values; those are grounded
+against the approved analysis plan/Methods source by the semantic workflow. It does
+not judge whether the surrounding interpretation is correct.
 """
 
 from __future__ import annotations
@@ -32,6 +34,28 @@ P_VALUE_COLUMNS = frozenset(
     {"p", "p value", "p_value", "p-value", "pval", "pvalue", "p val"}
 )
 P_VALUE_TEXT_RE = re.compile(r"\b\*?p\*?\s*(?:<=|>=|<|>|=)", flags=re.IGNORECASE)
+
+DESIGN_CONSTANT_AFTER_RE = re.compile(
+    r"^\s*(?:"
+    r"pM|nM|uM|µM|μM|mM|M|"
+    r"pg(?:/mL)?|ng(?:/mL)?|ug(?:/mL)?|µg(?:/mL)?|μg(?:/mL)?|mg(?:/mL)?|g(?:/mL)?|"
+    r"h|hr|hrs|hour|hours|min|mins|minute|minutes|s|sec|secs|second|seconds|"
+    r"day|days|week|weeks|°C|rpm|×|x"
+    r")\b",
+    flags=re.IGNORECASE,
+)
+REPLICATE_AFTER_RE = re.compile(
+    r"^\s*(?:independent\s+experiments?|biological\s+replicates?|technical\s+replicates?|replicates?)\b",
+    flags=re.IGNORECASE,
+)
+DESIGN_CONTEXT_BEFORE_RE = re.compile(
+    r"(?:"
+    r"\b(?:treated|exposed|incubated|cultured|seeded|plated|dosed)\b[^.;:]{0,30}\b(?:with|at|for|to)\s*$"
+    r"|\badministered\s*$"
+    r")",
+    flags=re.IGNORECASE,
+)
+
 STRUCTURAL_LABEL_RE = re.compile(
     r"\b(?:Table|Figure|Fig\.?|Section|Phase|Round|Reviewer|Comment|Line|Page|REV)\s*$",
     flags=re.IGNORECASE,
@@ -52,6 +76,7 @@ class NumberToken(NamedTuple):
     line: int
     comparator: str
     is_p_value: bool
+    is_percentage: bool
     decimals: int
     context: str
 
@@ -160,6 +185,24 @@ def is_structural_number(
     return False
 
 
+def is_experimental_design_constant(line: str, start: int, token: str, is_p_value: bool) -> bool:
+    """Return True for clearly method/design numbers that are not study result values.
+
+    This intentionally stays conservative: it only excludes explicit dose/time/temperature-like
+    constants and replicate counts with clear local wording. Result-like measurements remain
+    subject to CSV grounding.
+    """
+    if is_p_value:
+        return False
+    before = line[:start]
+    after = line[start + len(token):]
+    if REPLICATE_AFTER_RE.match(after):
+        return True
+    if DESIGN_CONSTANT_AFTER_RE.match(after) and DESIGN_CONTEXT_BEFORE_RE.search(before):
+        return True
+    return False
+
+
 def iter_artifact_numbers(artifact: Path) -> list[NumberToken]:
     text = strip_ignored_text(artifact.read_text(encoding="utf-8"))
     tokens: list[NumberToken] = []
@@ -173,6 +216,8 @@ def iter_artifact_numbers(artifact: Path) -> list[NumberToken]:
             value = to_float(raw_number)
             if is_structural_number(line, match.start(), full_token, is_p_value, value):
                 continue
+            if is_experimental_design_constant(line, match.start(), full_token, is_p_value):
+                continue
             tokens.append(
                 NumberToken(
                     value=value,
@@ -180,6 +225,7 @@ def iter_artifact_numbers(artifact: Path) -> list[NumberToken]:
                     line=line_number,
                     comparator=match.group("comp") or "",
                     is_p_value=is_p_value,
+                    is_percentage=bool(match.group("pct")),
                     decimals=decimal_places(raw_number),
                     context=line.strip(),
                 )
@@ -209,8 +255,19 @@ def matches_number(token: NumberToken, result_number: ResultNumber) -> bool:
         if token.comparator == ">=":
             return result_number.value >= token.value
 
+    # A manuscript percentage can never be grounded by a p-value field, even
+    # when the raw numeric value happens to be identical (e.g. 0.72% vs p=0.72).
+    if token.is_percentage and result_is_p_value(result_number):
+        return False
+
     if math.isclose(token.value, result_number.value, rel_tol=0, abs_tol=1e-12):
         return True
+
+    # Percentages may be stored either as percentage points (72) or proportions (0.72).
+    if token.is_percentage:
+        proportion_as_percent = result_number.value * 100.0
+        if math.isclose(token.value, round(proportion_as_percent, token.decimals), rel_tol=0, abs_tol=1e-12):
+            return True
 
     rounded = round(result_number.value, token.decimals)
     return math.isclose(token.value, rounded, rel_tol=0, abs_tol=1e-12)

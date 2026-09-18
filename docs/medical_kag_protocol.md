@@ -1,7 +1,8 @@
-# Medical-KAG Integration Protocol
+# Legacy Spine Medical-KAG Integration Protocol (Optional)
 
-> Use the `medical-kag-remote` MCP (a spine-surgery knowledge-augmented graph) **alongside**
-> `knowledge/evidence.md`, without weakening the grounding guarantees of this workflow.
+> The bundled `medical-kag-remote` is a **spine-surgery-specific** knowledge graph. Use it only when the manuscript topic genuinely matches that domain or the user explicitly asks to use it. It is **not** the primary evidence route for breast oncology, tumor biology, or general basic/translational research. Those projects use `knowledge/evidence.md` + PubMed-first discovery (`chatgpt/actions/search-evidence.md`, `scripts/search_pubmed.py`).
+>
+> When this legacy graph is domain-matched, use it only as an additive discovery/analysis/formatting aid alongside `knowledge/evidence.md`, without weakening grounding guarantees.
 
 ## The grounding rule (non-negotiable)
 
@@ -12,8 +13,7 @@ reads directly.
 - A paper surfaced by medical-kag is cited **only after** it is registered in
   `knowledge/evidence.md` as `[EVID:author_year]` (Rule 1). `scripts/check_citations.py` still
   gates every `[EVID:id]`.
-- Numbers still come only from `results/*.csv` (Rule, `check_numbers.py`). medical-kag effect
-  sizes inform the literature comparison, not the study's own Results.
+- The current study's **result values** still come only from `results/*.csv` (`check_numbers.py`); experimental-design constants come from the approved analysis plan/Methods source. medical-kag effect sizes are literature leads and must be verified against the cited source paper before use.
 - STOP signal: "medical-kag가 찾았으니 바로 인용해도 돼" → register in `evidence.md` first,
   verify the PMID/DOI, then cite.
 
@@ -38,9 +38,7 @@ Observed behavior against the live graph (~1,150 docs):
   Use it to MAP which outcomes favor which technique and which papers support it, then read the
   source papers — do not treat the aggregate as one comparison.
 - **Trust direction/rating, verify the numbers.** Effect magnitudes are sparsely populated
-  (observed ~21/87 outcomes had a value; `conflict synthesize` returned effect `0.00`). Take the
-  GRADE rating / direction / p-value as a lead, but pull the actual numbers from the source paper
-  → `knowledge/evidence.md` / `results/*.csv` (grounding rule).
+  (observed ~21/87 outcomes had a value; `conflict synthesize` returned effect `0.00`). Take the GRADE rating / direction / p-value only as a lead. Literature numbers must be verified against the source paper/evidence record; the current study's own result values come from `results/*.csv`.
 - **Ingestion is server-side.** The remote server cannot read local paths, so `document add_pdf`
   with a local PDF fails ("파일 없음"). Use `pubmed import_by_doi` / `import_by_pmids` (server
   fetches) or `analyze store_paper` (push structured data). DOI import may return abstract-only

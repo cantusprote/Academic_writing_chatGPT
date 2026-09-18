@@ -38,14 +38,14 @@ Revision 응답서는 `docs/response_letter_template.md` 형식으로 작성한 
 
 DOCX 생성 전에는 먼저 ghost-revision gate를 실행한다:
 
-```powershell
-python3 scripts/check_revision_claims.py drafts/revision\REV1\response_letter_REV1.md --strict
+```bash
+python3 scripts/check_revision_claims.py drafts/revision/REV1/response_letter_REV1.md --strict
 ```
 
 `GATE PASS`가 출력된 뒤 DOCX를 생성한다:
 
-```powershell
-python3 scripts/compile_response_docx.py drafts/revision\REV1\response_letter_REV1.md
+```bash
+python3 scripts/compile_response_docx.py drafts/revision/REV1/response_letter_REV1.md
 ```
 
 입력이 `drafts/revision/REV1/` 아래에 있으면 기본 출력은 `output/revision/REV1/response_letter_REV1_YYMMDD.docx`이다. 다른 위치의 입력 파일은 같은 폴더에 `*_YYMMDD.docx`로 출력한다.

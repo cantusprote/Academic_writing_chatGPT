@@ -1,4 +1,5 @@
 # Results
+<!-- Clinical-default skeleton. For Basic-Mechanistic/Hybrid projects, use `drafts/_templates/basic_results.md` and follow `drafts/story_map.md` claim order. -->
 
 <!--
 Guidelines (see docs/writing_guide.md):

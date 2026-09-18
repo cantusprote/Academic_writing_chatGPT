@@ -4,7 +4,7 @@
 > 각 산출 단계 뒤에 검증 게이트를 두어 제약 무시·인용 환각·수치 조작을 차단한다.
 > 검증은 **ChatGPT main agent + explicit Shellby execution**을 기본으로 한다. deterministic helper가 있으면 ChatGPT가 sSb/mSb에서 먼저 실행하고, 그 결과와 고정된 산출물을 바탕으로 independent verifier pass를 수행한다. 자동 hook 실행을 전제로 하지 않는다.
 > Phase 8 ghost-revision 검증은 `scripts/check_revision_claims.py`로 response-letter `[CHANGE]` claims를 revised manuscript 파일과 대조한다.
-> Semantic checks that require LLM judgment must use `docs/verifier_prompt_templates.md`.
+> Core manuscript semantic verifiers use `docs/verifier_prompt_templates.md`. The conditional basic/mechanistic overlay uses the structured schema in `chatgpt/actions/audit-mechanism.md` together with `docs/basic_research_checklist.md`; it is not replaced by a deterministic score.
 
 ---
 
@@ -25,10 +25,14 @@
 
 ## 2. Verifier 헌장
 
-Draft 게이트는 네 개의 Verifier(Constraint / Citation / Data / Logic)를 투입한다. Revision 게이트는 Logic을 제외하고 Ghost-Revision(revision_claims) + Response-alignment를 더한다 — 즉 Constraint / Citation / Data / Revision-claims / Response-alignment. 모든 Verifier는 공통 규칙을 따른다:
+Draft 게이트는 네 개의 **core Verifier**(Constraint / Citation / Data / Logic)를 투입한다. Basic/mechanistic project는 Phase 3와 Phase 6에 **Mechanism/Experimental-Claim overlay**를 추가한다. Revision 게이트는 Logic을 제외하고 Ghost-Revision(revision_claims) + Response-alignment를 더한다 — 즉 Constraint / Citation / Data / Revision-claims / Response-alignment.
+
+**Core Verifier 공통 규칙:**
 - **외부지식 사용 금지.** 주어진 소스(소스 오브 트루스)와 산출물만으로 판정한다.
 - **불확실하면 FAIL 기본값.** 지지 여부가 모호하면 PASS로 넘기지 않는다.
 - **판정 결과를 구조화 출력**한다 (3.2 형식).
+
+Mechanism overlay도 외부지식을 사용하지 않지만, 필수 artifact 자체가 없거나 central evidence가 불완전해 판정 불가능한 경우에는 `FAIL` 대신 명시적 `BLOCKED`를 사용할 수 있다. `BLOCKED`는 PASS가 아니며 다음 Phase로 진행할 수 없다.
 
 > **실행 순서 (Constraint 우선 + 병렬 검출):** 네 Verifier는 검출 단계에서 **독립적으로** 수행한다(§3.1). 가능하면 sSb/mSb fresh-context reviewer를 추가할 수 있으나 필수는 아니다. 다만 **Constraint(명세 적합)를 1순위 관문으로 본다** — 섹션이 draft_plan의 scope·tone·forbidden content를 위반하면, Phase 5 문체 손질을 시작하기 전에 먼저 바로잡는다. 곧 폐기될 문장을 다듬는 낭비를 막기 위함이다. 두 개 이상이 FAIL이면 수정도 Constraint부터.
 
@@ -58,8 +62,8 @@ Draft 게이트는 네 개의 Verifier(Constraint / Citation / Data / Logic)를 
 
 ### 2.3 Data-Grounding Verifier (수치 조작 F3)
 
-- **소스 오브 트루스:** `results/*.csv` (수치의 **유일한** 출처). table과 충돌 시 CSV가 우선하고 table을 flag.
-- **임무:** 원고의 모든 결과 수치(n, %, mean±SD, median/IQR, p-value, CI, OR/HR/RR, timepoint)가 results CSV 셀로 추적되는지 확인.
+- **소스 오브 트루스:** study **result values**는 `results/*.csv`가 정본이다. Experimental-design constants(용량, incubation time, replicate plan, acquisition setting 등)는 승인된 `data/analysis_plan.md`/Methods source가 정본이다. table과 result CSV가 충돌하면 CSV가 우선하고 table을 flag한다.
+- **임무:** 원고의 결과 수치(n, %, mean±SD, median/IQR, p-value, CI, OR/HR/RR 등)가 results CSV 셀로 추적되는지 확인한다. Methods/design constants를 study result로 오인하지 않는다. Result timepoint/label은 analysis plan과 result output에 일치해야 한다.
 - **제외 대상:** reference 연도, section/table/figure 번호, 버전 날짜, 저널 volume/issue.
 - **허용오차:**
   | 유형 | 허용 |
@@ -86,10 +90,32 @@ Draft 게이트는 네 개의 Verifier(Constraint / Citation / Data / Logic)를 
 
 ---
 
+
+### 2.4A Mechanism / Experimental-Claim Overlay (basic/mechanistic only)
+
+- **적용 대상:** wet-lab, mechanistic, preclinical, molecular/cell biology, tumor-microenvironment, and discovery-to-validation papers where the central claim depends on experimental biology.
+- **소스 오브 트루스:** `drafts/story_map.md`, `drafts/draft_plan.md`, relevant Results/figure legends/analysis outputs, `docs/basic_research_guide.md`, `docs/basic_research_analysis_guide.md`, `docs/experimental_evidence_guide.md`, `docs/figure_story_guide.md`, `docs/basic_research_checklist.md`. Literature context is limited to registered `knowledge/evidence.md` entries.
+- **실행:** `chatgpt/actions/audit-mechanism.md`. This is a semantic review against frozen artifacts; no deterministic script is currently used because mechanism adequacy cannot be reduced safely to a simple parser score.
+- **임무:**
+  - association vs function vs mechanism vs translational claim level 확인
+  - independent experimental unit / biological-vs-technical replicate hierarchy 확인
+  - planned contrast/statistical model, batch/block/repeated-measure structure가 실험설계와 일치하는지 확인
+  - randomization/blinding/sample-size rationale/predefined exclusions·QC가 해당 시 보고되었는지 확인
+  - cell/model identity, authentication/mycoplasma, reagent/construct provenance, image/source-data integrity를 해당 시 확인
+  - perturbation verification와 phenotype evidence 구분
+  - rescue/dependency/alternative explanation이 central mechanism claim에 필요한지 확인
+  - one dominant claim per main figure 및 panel inferential role 정렬 확인
+  - in vitro → in vivo → human/clinical wording boundary 확인
+- **판정:** `PASS | FAIL | BLOCKED`. Missing `story_map.md` or missing central evidence can yield `BLOCKED`; do not invent a PASS.
+- **FAIL 조건:** central claim이 evidence보다 강함, pseudo-replication 또는 중대한 design/reproducibility 문제가 central inference를 훼손함, mechanism wording에 필요한 specificity link가 없음, 또는 conclusion-changing boundary/negative evidence가 figure/story에서 숨겨짐.
+- **게이트 원장 check key:** `mechanism`. PASS에는 최소한 `story_map.md`와 audit 대상 핵심 artifact의 provenance hash를 기록한다.
+- **중요:** PASS는 모든 가능한 validation layer가 존재한다는 뜻이 아니다. Intended claim에 필요한 evidence가 충분하고 wording이 그 수준에 맞는다는 뜻이다.
+
+---
 ### 2.5 Ghost-Revision Checker (Phase 8)
 
 - **입력:** `drafts/revision/REV{N}/response_letter_REV{N}.md`의 `[CHANGE]` blocks, original section files, revised section files.
-- **명령:** `python3 scripts/check_revision_claims.py drafts/revision\REV1\response_letter_REV1.md --strict`
+- **명령:** `python3 scripts/check_revision_claims.py drafts/revision/REV1/response_letter_REV1.md --strict`
 - **임무:** 응답서가 주장한 manuscript change가 실제 revised manuscript에 반영되었는지 확인한다.
 - **확인 기준:**
   - `[CHANGE]` block에 `comment_id`, `section`, `expected_terms`가 있어야 한다.
@@ -119,7 +145,8 @@ Draft 게이트는 네 개의 Verifier(Constraint / Citation / Data / Logic)를 
 2. **Freeze & Verify** — 산출물을 고정(스냅샷)한 뒤 Verifier를 투입한다. 순서:
    - **(a) Deterministic helpers 먼저** — `check_citations.py`, `check_numbers.py`(해당 시 `check_revision_claims.py`)를 실행한다.
    - **(b) Independent LLM verifier passes** — Constraint / Citation / Data / Logic은 서로 독립된 pass로 수행한다. ChatGPT main agent가 각 verifier prompt를 별도 context로 적용하며, 가능하면 sSb/mSb의 fresh-context subagent 또는 second-model review를 사용할 수 있다. 모든 pass에는 **동일하게 고정된** 산출물 + source of truth를 제공하며, 검증이 끝날 때까지 산출물을 수정하지 않는다.
-3. **판정 & 기록** — 모든 Verifier가 PASS면 게이트 원장에 `status: PASS`와 함께 **검증 시점 sha256를 `provenance:`에 기록**한다(§6 freshness). `artifact`는 필수; 인용 게이트는 `evidence`(`knowledge/evidence.md`), 수치 게이트는 `results`(해당 CSV)도 기록한다(revision 게이트는 evidence/results 필수). 이후 그 파일이 바뀌면 PASS는 stale(무효)이며 다음 `check_gate.py --verify-hash`에서 FAIL로 잡힌다.
+   - **(c) Basic/mechanistic overlay when applicable** — Phase 3와 Phase 6에서 같은 frozen `story_map.md` + central Results/figure artifacts를 대상으로 `audit-mechanism.md`를 수행한다. Core verifiers와 마찬가지로 audit 중 artifact를 수정하지 않는다.
+3. **판정 & 기록** — 필요한 core Verifier와 적용되는 overlay가 모두 PASS면 게이트 원장에 `status: PASS`와 함께 **검증 시점 sha256를 `provenance:`에 기록**한다(§6 freshness). `artifact`는 필수; 인용 게이트는 `evidence`(`knowledge/evidence.md`), 수치 게이트는 `results`(해당 CSV)도 기록한다(revision 게이트는 evidence/results 필수). 이후 그 파일이 바뀌면 PASS는 stale(무효)이며 다음 `check_gate.py --verify-hash`에서 FAIL로 잡힌다.
 4. **Fix loop** — 하나라도 FAIL이면 산출물을 수정하고 2단계로 돌아간다.
    - **수정 우선순위: Constraint(명세) 위반 먼저.** 명세 위반을 고치면 섹션이 재작성되어 다른 지적이 무의미해질 수 있으므로, 품질·문체 손질보다 명세 적합을 먼저 맞춘다.
    - 산출물이 바뀌었으므로 **이전 PASS를 모두 폐기하고 필요한 Verifier 전체를 재실행**한다(부분 재검증 금지). `provenance` 해시도 새로 기록한다.
@@ -180,8 +207,9 @@ required_action: replace with 54.3 or remove
 
 ### 5.2 results = 단일 진실
 
-- 원고의 결과 수치는 `results/*.csv`에 존재하는 값만 허용한다.
-- CSV에 없는 결과 수치를 prose에 새로 만들어 쓰지 않는다.
+- 원고의 **study result values**는 `results/*.csv`에 존재하는 값만 허용한다.
+- Experimental-design constants는 승인된 `analysis_plan.md`/Methods source에 근거한다.
+- CSV나 승인된 design source에 없는 수치를 prose에 새로 만들어 쓰지 않는다.
 
 ---
 
@@ -193,8 +221,8 @@ required_action: replace with 54.3 or remove
 - **규칙:** 어떤 섹션/단계도 게이트 원장에 해당 산출물의 `status: PASS`가 없으면 다음으로 진행 금지.
 - **Freshness (stale-gate guard):** PASS 기록 시 검증 대상 파일의 sha256를 `provenance:` 블록에 적고, 게이트 확인 시 `--verify-hash`로 재대조한다. 파일이 바뀌었으면 stale로 FAIL — **병렬 검증·revision 라운드에서 낡은 PASS가 살아남는 것을 막는다.** 해시 계산: `python3 scripts/check_gate.py --compute-hash drafts/05_results.md`.
 - **Cross-check (ledger ↔ live):** `--require-check`는 원장이 `PASS`라고 *적혀 있는지*만 본다. 결정적 차원(`citation`/`numbers`/`revision_claims`)은 `--cross-check LABEL=PATH`로 **정본 checker를 즉석 재실행**해 원장 기록이 실제와 일치하는지 검증한다. checker를 돌리지 않고 적은 가짜 `PASS`, 또는 산출물이 바뀐 뒤 남은 stale `PASS`를 모순(contradiction)으로 잡는다. **live 체크가 FAIL이면 원장 내용과 무관하게 게이트 FAIL** — 깨진 산출물은 원장이 정직하게 FAIL을 적었더라도 통과할 수 없다(그 차원을 `--require-check`로 걸지 않았어도). 소스 미도달 시 조용히 통과하지 않고 **loud FAIL**. 이는 STOP Signals의 "PASS 받았으니 안전" 자기기만을 결정적으로 차단한다.
-- **Deterministic ledger check:** `python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md --results results`
-- **Required order:** ChatGPT가 sSb/mSb로 explicit 실행하는 deterministic helpers (`check_citations.py`, `check_numbers.py`, `check_revision_claims.py`) → independent LLM verifier schema (`docs/verifier_prompt_templates.md`) → gate ledger entry → `check_gate.py` (`--verify-hash` freshness + `--cross-check` ledger↔live 대조 포함).
+- **Deterministic ledger check:** `python3 scripts/check_gate.py review/gates/phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --cross-check citation=drafts/05_results.md --cross-check numbers=drafts/05_results.md --results results`
+- **Required order:** ChatGPT가 sSb/mSb로 explicit 실행하는 deterministic helpers (`check_citations.py`, `check_numbers.py`, `check_revision_claims.py`) → independent LLM verifier schema (`docs/verifier_prompt_templates.md`) → **Phase 3/6 basic-mechanistic이면 `audit-mechanism.md` semantic overlay** (Phase 4는 central claim/story premises가 바뀐 경우에만 targeted re-audit) → gate ledger entry → `check_gate.py` (`--verify-hash` freshness + deterministic 차원에 대한 `--cross-check` ledger↔live 대조 포함). Mechanism overlay는 현재 deterministic cross-check가 없으므로 frozen-artifact provenance hash + recorded semantic verdict로 freshness를 관리한다.
 
 ---
 
@@ -202,8 +230,8 @@ required_action: replace with 54.3 or remove
 
 | Phase | 게이트 | Verifier | 루프 단위 |
 |---|---|---|---|
-| 3 Draft Plan | Claim→Citation 사전검증 | Citation | 매핑 전체 |
+| 3 Draft Plan | Claim→Citation 사전검증; basic/mechanistic story gate | Citation + **Mechanism overlay (해당 시)** | 매핑 / story map 전체 |
 | 4 Draft | 섹션 게이트 | Constraint + Citation + Data + Logic | 섹션 단위 (자율) |
 | 5 Style-pass | style 게이트 | Style-Conformance | 섹션 단위 (자율) |
-| 6 QC | 최종 확인 (경량) | — (인라인 게이트가 이미 수행) | 원고 전체 |
+| 6 QC | 최종 확인 + basic/mechanistic re-audit | **Mechanism overlay (해당 시)**; core checks are re-run as defined by QC | 원고/figure story 전체 |
 | 8 Revision | 응답 게이트 | Constraint + Citation + Data + ghost-revision diff + Response alignment | 응답 단위 (자율) |

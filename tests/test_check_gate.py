@@ -98,6 +98,42 @@ class CheckGateTests(unittest.TestCase):
             self.assertIn("required check citation is FAIL", reasons)
             self.assertIn("required check logic is missing", reasons)
 
+    def test_phase3_mechanism_gate_requires_true_pass(self) -> None:
+        module = load_module()
+        template = (
+            "phase: Phase 3 - Basic Story\n"
+            "artifact: drafts/story_map.md\n"
+            "status: PASS\n"
+            "checks:\n"
+            "  mechanism: {verdict}\n"
+            "round: 1\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            gate_path = Path(tmp) / "phase_03_story.GATE.md"
+            gate_path.write_text(template.format(verdict="PASS"), encoding="utf-8")
+            passed = module.check_gate(
+                gate_path, required_checks=["mechanism"], artifact="drafts/story_map.md"
+            )
+            self.assertTrue(passed.passed)
+
+            for verdict in ("FAIL", "BLOCKED"):
+                gate_path.write_text(template.format(verdict=verdict), encoding="utf-8")
+                failed = module.check_gate(
+                    gate_path, required_checks=["mechanism"], artifact="drafts/story_map.md"
+                )
+                self.assertFalse(failed.passed)
+                self.assertTrue(any("required check mechanism" in f.reason for f in failed.failures))
+
+            gate_path.write_text(
+                template.format(verdict="PASS").replace("  mechanism: PASS\n", ""),
+                encoding="utf-8",
+            )
+            missing = module.check_gate(
+                gate_path, required_checks=["mechanism"], artifact="drafts/story_map.md"
+            )
+            self.assertFalse(missing.passed)
+            self.assertTrue(any("required check mechanism is missing" in f.reason for f in missing.failures))
+
     def test_check_gate_fails_when_artifact_does_not_match(self) -> None:
         module = load_module()
 

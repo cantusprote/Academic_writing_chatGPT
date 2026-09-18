@@ -1,181 +1,208 @@
 # Analysis Plan
 
-> 통계 분석 전 반드시 작성하고 사용자 승인 후 진행합니다.
-> 상세 통계 가이드: `docs/statistical_analysis_guide.md` 참조
+> 분석 전 반드시 작성하고 사용자 승인 후 진행합니다.
+> **Research-mode routing:**
+> - Clinical oncology / clinical translational → `docs/oncology_analysis_guide.md`
+> - Basic / mechanistic experimental → `docs/basic_research_analysis_guide.md`
+> - Hybrid → apply both guides to their respective components
+> - `docs/statistical_analysis_guide.md` is generic background only; mode-specific guides override conflicting heuristics.
 
 ---
 
-## 1. Research Question & Hypothesis (연구 질문 및 가설)
+## 1. Research Question and Mode
 
-**연구 질문:**
-- [연구 질문을 구체적으로 기술]
+- **Research question:** [구체적으로 기술]
+- **Hypothesis / expected biological or clinical contrast:** [필요 시]
+- **Mode:** [Clinical / Translational-Clinical / Basic-Mechanistic / Hybrid]
+- **Confirmatory vs exploratory status:** [confirmatory / exploratory / mixed]
 
-**가설:**
-- H0: [귀무가설]
-- H1: [대립가설]
+### Basic / Mechanistic Question (Basic-Mechanistic or Hybrid only)
+- **Biological question:** [무엇을 검증하는가]
+- **Planned biological contrast:** [control vs perturbation / genotype × treatment / time × condition / etc.]
+- **Primary phenotype/readout:** [주요 기능/표현형 readout]
+- **Desired claim class:** [descriptive / association / functional / necessity / sufficiency / mechanism]
 
 ---
 
-## 2. Study Population (대상 선정/제외 기준)
+## 2A. Clinical / Clinical-Translational Design (Clinical, Translational-Clinical, or Hybrid only)
 
-**Design:** `[연구 설계 입력: RCT / Cohort / Case-Control / etc.]`
-
-**Inclusion Criteria:**
-- [기준 1]
-- [기준 2]
-
-**Exclusion Criteria:**
-- [기준 1]
-- [기준 2]
-
-**Expected Sample Size:** [N]
-
-### Analysis Population / Estimand
+- **Design:** [RCT / prospective cohort / retrospective cohort / case-control / biomarker study / other]
+- **Population / setting:** [target population, institution(s), period]
+- **Inclusion criteria:** [list]
+- **Exclusion criteria:** [list]
+- **Expected/available sample size:** [N + rationale if prospective]
 - **Analysis population(s):** [ITT / modified ITT / per-protocol / safety / biomarker-evaluable / other]
-- **Estimand:** [treatment/exposure contrast, target population, endpoint/variable, handling of intercurrent events, summary measure]
-- **Oncology context (if applicable):** [early/metastatic; neoadjuvant/adjuvant/advanced; breast cancer subtype such as HR+/HER2−, HER2+, TNBC]
+- **Estimand:** [treatment/exposure contrast, target population, variable/endpoint, intercurrent-event handling, summary measure]
+- **Oncology context:** [early/metastatic; neoadjuvant/adjuvant/advanced; subtype]
+
+### Clinical Endpoint Definition Table
+
+| Endpoint | Role | Operational definition | Time origin / assessment | Event | Censoring / competing event | Analysis population |
+|---|---|---|---|---|---|---|
+| [endpoint] | Primary/Secondary/Exploratory | [definition] | [origin/schedule] | [event] | [rule] | [population] |
+
+### Oncology Response / Pathology Fields (if applicable)
+- **RECIST:** [version; BOR/ORR/DCR/DoR; confirmation; investigator vs central review]
+- **pCR:** [protocol-specific definition]
+- **RCB:** [continuous index and/or class; assessment method]
+- **Assessment schedule:** [timing]
+
+### Biomarker / ctDNA Fields (if applicable)
+- **Biomarker hypothesis/role:** [prognostic / predictive / pharmacodynamic / exploratory]
+- **Assay/specimen:** [platform, specimen, collection time points, QC/evaluable criteria]
+- **Cut-point:** [prespecified / validated / continuous primary / explicitly exploratory]
+- **Predictive analysis:** [treatment × biomarker interaction or equivalent]
+- **Longitudinal ctDNA:** [baseline / clearance / persistence / emergence; landmark or time-dependent strategy]
 
 ---
 
-## 3. Data Overview
+## 2B. Basic / Mechanistic Experimental Design (Basic-Mechanistic or Hybrid only)
 
-### Source File
-- **File:** `[filename.csv/xlsx]`
-- **Rows:** `[n rows]`
-- **Columns:** `[n columns]`
+- **Experimental system(s):** [cell line / primary cell / organoid / animal / tissue / imaging / omics / other]
+- **Independent experimental unit:** [independent experiment / donor / animal / specimen / other]
+- **Biological replicate:** [definition and planned/available n]
+- **Technical replicate / subsample:** [wells / fields / cells / ROIs / repeated measurements]
+- **Nested hierarchy:** [e.g., cells → fields → wells → experiment → donor]
+- **Factor/intervention structure:** [treatment / genotype / time / dose / factorial design]
+- **Primary planned contrast:** [exact comparison or interaction]
+- **Batch/block factors:** [experimental day / plate / operator / litter / sequencing batch / other]
+- **Repeated measures:** [none / time / region / repeated condition / other]
+- **Randomization/allocation:** [method / not applicable + rationale]
+- **Blinding/masking:** [acquisition / scoring / analysis / not feasible + rationale]
+- **Sample-size rationale:** [prospective power / precision / exploratory-resource rationale / field convention]
+- **Predefined exclusion/QC criteria:** [failed perturbation, contamination, assay QC, humane endpoint, imaging/omics QC, etc.]
 
-### Variable Summary
+### Experimental Readout Table
 
-| Variable | Type | Description | Role | Missing (%) |
-|----------|------|-------------|------|-------------|
-| `[var]` | Continuous/Categorical | `[설명]` | Primary/Secondary/Covariate | `[%]` |
+| Readout | Role | Scale / normalization | Unit of inference | Condition / time | Target-engagement separate? |
+|---|---|---|---|---|---|
+| [phenotype/assay] | Primary/Secondary/Exploratory | [raw/fold/normalized/transformed] | [biological unit] | [dose/time/context] | [yes/no + assay] |
 
----
-
-## 4. Variable Definitions (변수 정의)
-
-### Endpoint Definition Table
-
-> Time-to-event endpoints must pre-specify time origin, event, and censoring. Use disease-specific consensus definitions (e.g., STEEP/NeoSTEEP) when applicable rather than relying on endpoint labels alone.
-
-| Endpoint | Definition / Assessment | Time Origin | Event | Censoring / Competing Event | Analysis Population |
-|----------|-------------------------|-------------|-------|-----------------------------|---------------------|
-| [Primary/Secondary endpoint] | [operational definition] | [randomization/surgery/treatment start/etc.] | [event definition] | [censoring rule; competing event if relevant] | [population] |
-
-### Primary Endpoint
-- **Variable:** [변수명]
-- **Definition:** [정의]
-- **Measurement:** [측정 방법 및 시점]
-
-### Secondary Endpoints
-- [변수명]: [정의 및 측정 방법]
-- [변수명]: [정의 및 측정 방법]
-
-### Exploratory Endpoints (해당 시)
-- [변수명]: [정의]
-
-### Oncology Response / Pathology Fields (해당 시)
-- **RECIST:** [version; BOR/ORR/DCR/DoR definition; confirmation requirement]
-- **pCR:** [protocol-specific definition, e.g., ypT0/is ypN0]
-- **RCB:** [continuous score and/or class 0/I/II/III; assessment method]
-- **Assessment schedule / central review:** [timing; investigator vs independent review]
-
-### Covariates / Confounders
-- [변수명]: [정의 및 선정 근거]
+### Model / Reagent Identity (if applicable)
+- **Cell/model source and authentication:** [source, identity method, mycoplasma status, passage/provenance]
+- **Critical reagents/constructs:** [clone/catalog/provider/sequence/vector as appropriate]
+- **Animal model:** [species/strain/sex/age; housing/allocation/humane endpoint as appropriate]
 
 ---
 
-## 5. Statistical Methods (통계 검정법 선택 및 근거)
+## 3. Data Overview (all modes)
 
-### Descriptive Statistics
-- Continuous: mean ± SD and/or median [IQR] according to distribution, scale, and scientific purpose; inspect graphical/distributional features when model assumptions matter
-- Categorical: n (%)
+### Source Files
+- **Raw/processed file(s):** [filename.csv/xlsx/etc.]
+- **Rows / observations:** [n]
+- **Columns / features:** [n]
+- **Unit represented by one row:** [patient / animal / experiment / donor / cell / other]
 
-### Comparative Analysis
+### Variable / Feature Summary
 
-| Comparison | Variable Type | Distribution | Test | Justification |
-|------------|---------------|--------------|------|---------------|
-| [비교 내용] | Continuous/Categorical | Normal/Non-normal | [검정법] | [선택 근거] |
-
-### Advanced Analysis (해당 시)
-- [ ] Linear regression — [목적]
-- [ ] Logistic regression — [목적]
-- [ ] Cox regression — [목적]
-- [ ] Competing-risk analysis — [competing event; cumulative incidence / cause-specific hazard / Fine-Gray as appropriate]
-- [ ] Landmark analysis — [pre-specified landmark; eligibility; target contrast]
-- [ ] Time-dependent covariate analysis — [time-varying exposure/biomarker; model and time alignment]
-- [ ] Other: [specify]
-
-### Biomarker / Translational / ctDNA Plan (해당 시)
-- **Biomarker hypothesis and role:** [prognostic / predictive / pharmacodynamic / exploratory]
-- **Assay/specimen:** [tissue/plasma; platform; collection time points; QC/evaluable criteria]
-- **Cut-point:** [pre-specified / validated / continuous primary; data-derived explicitly exploratory]
-- **Predictive effect:** [treatment × biomarker interaction; do not infer interaction from subgroup p-values]
-- **Longitudinal ctDNA:** [baseline; clearance/persistence/emergence; landmark or time-dependent strategy; immortal-time bias prevention]
-- **High-dimensional analyses:** [feature filtering/model validation; FDR; internal/external validation as applicable]
+| Variable / feature | Type | Description | Role | Missing/QC issue |
+|---|---|---|---|---|
+| [var] | Continuous/Categorical/Count/etc. | [description] | Primary/Secondary/Covariate/Factor | [details] |
 
 ---
 
-## 6. Significance Level & Multiple Comparison (유의수준 및 다중비교 보정)
+## 4. Statistical Model and Effect Estimate
 
-| Parameter | Value |
-|-----------|-------|
-| Significance level (α) | 0.05 |
-| Confidence interval | 95% |
-| Multiple comparison correction | [None / Bonferroni / Holm / FDR] |
-| Correction 적용 대상 | [어떤 비교에 적용할지] |
+### Planned Analyses
 
-### Multiplicity Families
-| Family | Hypotheses / Endpoints | Confirmatory vs Exploratory | Error Control / Testing Strategy |
-|--------|-------------------------|----------------------------|----------------------------------|
-| [Primary] | [hypotheses] | [confirmatory] | [α allocation / hierarchy / gatekeeping / other] |
-| [Secondary/subgroup/biomarker] | [hypotheses] | [confirmatory/exploratory] | [FWER/FDR/none with exploratory labeling] |
+| Scientific contrast / question | Experimental or analysis unit | Dependency structure | Model/test | Effect estimate | Justification |
+|---|---|---|---|---|---|
+| [comparison] | [unit] | [independent/paired/nested/repeated] | [model] | [difference/ratio/coefficient/interaction/etc.] | [reason] |
+
+### Clinical-specific advanced methods (if applicable)
+- [ ] Cox / flexible survival model — [purpose]
+- [ ] Competing-risk analysis — [event/competing event; CIF/cause-specific/Fine-Gray as appropriate]
+- [ ] Landmark analysis — [landmark; eligibility; target contrast]
+- [ ] Time-dependent covariate analysis — [time alignment]
+- [ ] Causal/propensity method — [estimand, variables, balance diagnostics]
+
+### Basic / Mechanistic model structure (if applicable)
+- **Primary model:** [linear / generalized / mixed-effects / paired / nonparametric / other]
+- **Repeated/nested handling:** [model or summary strategy]
+- **Batch/block handling:** [fixed/random/block factor / other]
+- **Technical replicate handling:** [summary before inference / hierarchical model / other]
+- **Effect estimate + uncertainty:** [difference / fold change with scale / coefficient / interaction / CI]
+- **Robustness/sensitivity:** [alternative model/summary/exclusion strategy]
+
+> Do not select parametric vs nonparametric methods from a normality-test p-value alone. For basic/mechanistic work, start from the experimental unit, contrast, dependency structure, and model assumptions.
 
 ---
 
-## 7. Missing Data & Sensitivity Analyses
+## 5. Multiplicity and Error Control
 
-- **Extent/pattern:** [variables/time points; summarize missingness]
-- **Primary handling:** [complete case / multiple imputation / likelihood-based / endpoint-specific censoring / other, with assumptions]
-- **Outcome/biomarker missingness:** [non-evaluable scans, missing pathology, unavailable tissue/plasma, assay failure]
-- **Sensitivity analyses:** [alternative censoring/event definitions; missing-data assumptions; analysis population; model assumptions]
-- **Causal-bias checks (observational/landmark studies):** [confounding; immortal-time/guarantee-time; selection; informative censoring; time-varying confounding as applicable]
+- **Significance level / confidence level:** [if inferential testing is used]
+- **Hypothesis family:** [define scientifically; do not define by raw comparison count]
+- **Confirmatory vs exploratory:** [state]
+- **Strategy:** [none justified / hierarchy / gatekeeping / Holm/Bonferroni / FDR / other]
+
+| Family | Hypotheses / readouts | Role | Error-control strategy |
+|---|---|---|---|
+| [family] | [items] | Confirmatory/Exploratory | [strategy] |
 
 ---
 
-## 8. Output Plan
+## 6. Missingness, Exclusions, QC, and Sensitivity
 
-### Scripts (→ data/py/)
+### Clinical / patient data (if applicable)
+- **Missing outcomes/covariates/specimens:** [extent/pattern]
+- **Primary handling:** [complete case / MI / likelihood / censoring / other]
+- **Sensitivity:** [alternative censoring/event/missing-data assumptions]
+- **Bias checks:** [confounding, immortal-time, informative censoring, selection, etc.]
+
+### Experimental data (if applicable)
+- **Assay/model QC failure:** [rule]
+- **Contamination/acquisition failure:** [rule]
+- **Outlier handling:** [prespecified rule; do not exclude for unfavorable result]
+- **Non-evaluable animal/specimen/image/omics sample:** [rule]
+- **Sensitivity/robustness:** [alternative exclusions, summaries, models, batches]
+
+---
+
+## 7. Output Plan
+
+### Analysis scripts
 | Script | Purpose |
-|--------|---------|
-| 01_descriptive.py | Baseline demographics |
-| 02_comparative.py | Group comparisons |
-| 03_regression.py | Advanced analysis (if needed) |
+|---|---|
+| [01_*.py / .R] | [mode-appropriate analysis] |
+| [02_*.py / .R] | [mode-appropriate analysis] |
 
-### Tables (→ drafts/)
-| Table | Content | Source |
-|-------|---------|--------|
-| table_1.md | Demographics & Baseline | results/table1_demographics.csv |
-| table_2.md | Primary Outcomes | results/table2_outcomes.csv |
-| table_3.md | [Additional Analysis] | results/table3_*.csv |
+### Canonical result files (`results/`)
+| File | Content |
+|---|---|
+| [result_*.csv] | [result values that may appear in manuscript/tables/figures] |
 
-### Figures (→ drafts/figures/)
-| Figure | Content | Type |
-|--------|---------|------|
-| [fig_N.png] | [내용] | [Bar/Box/Line/Survival/Flow] |
+> **Numerical grounding:** study **result values** in the manuscript must trace to `results/*.csv`. Experimental-design constants (dose, incubation time, seeding density, planned replicate count, acquisition settings, etc.) are grounded in this approved analysis plan / Methods source, not in `results/*.csv`.
+
+### Tables / Figures
+| Artifact | Scientific purpose | Source |
+|---|---|---|
+| [table/figure] | [claim/readout] | [result CSV / analysis output] |
 
 ---
 
 ## Checklist Before Proceeding
 
-- [ ] 연구 질문과 가설이 명확한가?
-- [ ] 선정/제외 기준이 구체적인가?
-- [ ] Primary endpoint가 1개로 정의되었는가?
-- [ ] Analysis population과 estimand가 명확한가?
-- [ ] Time-to-event endpoint의 time origin/event/censoring이 명시되었는가?
-- [ ] 해당 시 RECIST/pCR/RCB 및 competing-risk/landmark/time-dependent 분석이 사전 정의되었는가?
-- [ ] Biomarker/ctDNA 가설, interaction, longitudinal analysis가 사전 정의되었는가?
-- [ ] 통계 검정법이 데이터 유형에 적합한가?
-- [ ] Multiplicity family와 error-control 전략이 정의되었는가?
-- [ ] Missing data와 주요 sensitivity analysis가 계획되었는가?
+### All modes
+- [ ] Research mode is explicit.
+- [ ] Research/biological question and planned contrast are clear.
+- [ ] Statistical model follows the unit of inference and dependency structure.
+- [ ] Multiplicity family/strategy is defined when applicable.
+- [ ] Missingness/exclusion/QC and sensitivity rules are specified where applicable.
+
+### Clinical / Clinical-Translational only
+- [ ] Population, eligibility, and analysis population(s) are explicit.
+- [ ] Estimand is defined where applicable.
+- [ ] Primary/key endpoint(s) are operationally defined.
+- [ ] TTE endpoints specify time origin/event/censoring/competing events.
+- [ ] RECIST/pCR/RCB and biomarker/ctDNA timing are prespecified when applicable.
+
+### Basic / Mechanistic only
+- [ ] Independent experimental unit is explicit.
+- [ ] Biological vs technical replicates and nested observations are separated.
+- [ ] Planned contrast and primary phenotype/readout are explicit.
+- [ ] Batch/block/repeated-measure structure is handled by design/model.
+- [ ] Randomization/blinding/sample-size rationale/exclusion rules are documented when applicable.
+- [ ] Target-engagement verification is separated from phenotype evidence.
+- [ ] Model/reagent identity and authentication requirements are documented when applicable.
+
 - [ ] **사용자 승인 완료** → 분석 진행

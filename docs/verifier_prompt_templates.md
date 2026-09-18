@@ -198,8 +198,8 @@ overclaiming by omission (Scite-style, but claim-specific). Advisory map, not a 
 Required inputs:
 
 - the manuscript claim (sentence)
-- each cited `[EVID:id]` entry in `knowledge/evidence.md` (+ summary / medical-kag data when available)
-- medical-kag `conflict find/detect` output when available (surfaces contrasting studies)
+- each cited `[EVID:id]` entry in `knowledge/evidence.md` plus verified source/summary material when available
+- optional domain-matched conflict/retrieval output when available (supplementary only; not required)
 
 Prompt:
 
@@ -260,6 +260,6 @@ Then run `scripts/check_gate.py`.
 
 Example:
 
-```powershell
-python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md
+```bash
+python3 scripts/check_gate.py review/gates/phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md
 ```

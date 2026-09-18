@@ -1,13 +1,11 @@
-> Action purpose: 인용 출처가 claim을 지지/반박/언급하는지 분류 (Discussion 균형·overclaim 가드; GraphRAG 주, evidence.md 보조)
+> Action purpose: 인용 출처가 claim을 지지/반박/언급하는지 분류하고 Discussion의 one-sided framing을 점검
 
-
-**언제 사용:** Discussion 작성/QC 시, 인용이 한쪽으로 치우치지 않았는지(균형) 점검.
+**언제 사용:** Discussion 작성/QC.
 
 `docs/citation_assist_protocol.md` Operation 3을 따른다.
 
-대상: **[user-specified target/options]** (claim 한 줄, 또는 섹션 파일)
-
-1. **claim·인용 식별:** 섹션이면 `python3 scripts/extract_claims.py <section> --json`로 `[EVID:id]` 문장 추출.
-2. **근거 회수 + 반박 탐색:** 각 출처 회수(KAG 주/evidence.md 보조). medical-kag `conflict find/detect`로 **빠진 반박 연구** 탐색.
-3. **stance 분류:** `docs/verifier_prompt_templates.md`의 Citation-Stance로 각 출처 → **supporting / contrasting / mentioning** + 사유.
-4. **출력:** stance 요약 + **one-sided 경고**(반박 근거가 있는데 인용 안 됐으면) = overclaim-by-omission 가드. claim·출처는 모두 evidence.md `[EVID:id]` 기준.
+1. claim과 `[EVID:id]`를 식별한다 (`extract_claims.py` 사용 가능).
+2. registered evidence/source를 기준으로 각 citation을 **supporting / contrasting / mentioning**으로 분류한다.
+3. 중요한/논쟁적 claim이면 PubMed에서 상반된 evidence를 추가 검색한다.
+4. domain-matched optional conflict/KAG backend가 있으면 보조적으로 사용할 수 있으나 필수는 아니다.
+5. material contrasting evidence가 존재하지만 정당한 이유 없이 빠져 있으면 **one-sided**로 flag한다.

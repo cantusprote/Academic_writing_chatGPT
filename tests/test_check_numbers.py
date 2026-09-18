@@ -464,12 +464,94 @@ class CheckNumbersTests(unittest.TestCase):
         module = load_module()
         token = module.NumberToken(
             value=0.05, number="0.05", line=1, comparator=">",
-            is_p_value=True, decimals=2, context="p>0.05",
+            is_p_value=True, is_percentage=False, decimals=2, context="p>0.05",
         )
         above = module.ResultNumber(value=0.42, raw="0.42", source=Path("x.csv"), row=2, column="p_value")
         below = module.ResultNumber(value=0.001, raw="0.001", source=Path("x.csv"), row=2, column="p_value")
         self.assertTrue(module.matches_number(token, above))
         self.assertFalse(module.matches_number(token, below))
+
+    def test_basic_results_ignore_clear_design_constants_and_match_proportion_percentage(self) -> None:
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            results_dir = root / "results"
+            results_dir.mkdir()
+            artifact = root / "05_results.md"
+            (results_dir / "basic.csv").write_text(
+                "metric,value\nviability,0.72\n", encoding="utf-8"
+            )
+            artifact.write_text(
+                "Cells were treated with 10 nM drug for 24 h in 3 independent experiments; viability was 72%.",
+                encoding="utf-8",
+            )
+            result = module.check_numbers([artifact], results_dir=results_dir)
+            self.assertTrue(result.passed)
+            self.assertEqual(result.checked_numbers, 1)
+
+    def test_percentage_exact_value_does_not_match_pvalue(self) -> None:
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            results_dir = root / "results"
+            results_dir.mkdir()
+            artifact = root / "05_results.md"
+            (results_dir / "basic.csv").write_text(
+                "metric,p_value\nx,0.72\n", encoding="utf-8"
+            )
+            artifact.write_text("The event rate was 0.72%.", encoding="utf-8")
+            result = module.check_numbers([artifact], results_dir=results_dir)
+            self.assertFalse(result.passed)
+            self.assertEqual(result.checked_numbers, 1)
+
+    def test_reported_median_dose_is_not_misclassified_as_design_constant(self) -> None:
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            results_dir = root / "results"
+            results_dir.mkdir()
+            artifact = root / "05_results.md"
+            (results_dir / "dose.csv").write_text(
+                "metric,value\nmedian_dose,5\n", encoding="utf-8"
+            )
+            artifact.write_text(
+                "Patients were administered 5 mg and the median dose was 5 mg.",
+                encoding="utf-8",
+            )
+            tokens = module.iter_artifact_numbers(artifact)
+            self.assertEqual([token.number for token in tokens], ["5"])
+            result = module.check_numbers([artifact], results_dir=results_dir)
+            self.assertTrue(result.passed)
+            self.assertEqual(result.checked_numbers, 1)
+
+    def test_percentage_does_not_match_pvalue_proportion(self) -> None:
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            results_dir = root / "results"
+            results_dir.mkdir()
+            artifact = root / "05_results.md"
+            (results_dir / "basic.csv").write_text(
+                "metric,p_value\nviability,0.72\n", encoding="utf-8"
+            )
+            artifact.write_text("Viability was 72%.", encoding="utf-8")
+            result = module.check_numbers([artifact], results_dir=results_dir)
+            self.assertFalse(result.passed)
+
+    def test_result_with_physical_unit_is_not_blanket_ignored(self) -> None:
+        module = load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            results_dir = root / "results"
+            results_dir.mkdir()
+            artifact = root / "05_results.md"
+            (results_dir / "basic.csv").write_text(
+                "metric,value\ntumor_volume,120\n", encoding="utf-8"
+            )
+            artifact.write_text("Mean tumor volume was 120 mm3.", encoding="utf-8")
+            result = module.check_numbers([artifact], results_dir=results_dir)
+            self.assertTrue(result.passed)
+            self.assertEqual(result.checked_numbers, 1)
 
 
 class IsStructuralNumberTests(unittest.TestCase):

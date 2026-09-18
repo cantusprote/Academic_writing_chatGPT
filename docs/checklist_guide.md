@@ -20,6 +20,12 @@
 | Diagnostic Accuracy | STARD | 진단 검사 연구 |
 | Clinical Trial Protocol | SPIRIT | 프로토콜 논문 |
 | Quality Improvement | SQUIRE | QI 연구 |
+| In vivo animal experiments | ARRIVE 2.0 | Animal/preclinical in vivo research; pair with `docs/basic_research_checklist.md` |
+
+## Basic / Mechanistic Reporting Overlay
+
+For Basic-Mechanistic/Hybrid projects, run `docs/basic_research_checklist.md` in addition to the design-specific checklist. For in vivo animal studies, check ARRIVE 2.0 Essential 10 and use the Recommended Set as applicable. The basic checklist also covers experimental-unit definition, randomization/blinding, sample-size rationale, exclusions, cell/model authentication, mycoplasma status, reagent identity, image/source-data integrity, and data/code/material availability.
+
 
 ---
 

@@ -1,13 +1,11 @@
-> Action purpose: 초안의 각 [EVID:id] 문장을 근거와 대조해 SUPPORTED/PARTIAL/UNSUPPORTED 분류 리포트 (GraphRAG 주, evidence.md 보조)
+> Action purpose: 초안의 각 `[EVID:id]` 문장을 registered evidence/source와 대조해 claim-support 리포트를 만든다.
 
-
-**언제 사용:** Phase 6 QC — 인용 문장이 실제로 근거에 의해 지지되는지 **문장별** 점검 (check_citations의 존재 확인보다 한 단계 깊음).
+**언제 사용:** Phase 6 QC 또는 중요한 literature claim 검증.
 
 `docs/citation_assist_protocol.md` Operation 2를 따른다.
 
-대상: **[user-specified target/options]** (생략 시 drafts의 본문 섹션들)
-
-1. **claim 추출:** `python3 scripts/extract_claims.py <section> --json` → `[EVID:id]` 문장 목록.
-2. **근거 회수:** 각 `[EVID:id]`의 출처 내용 — medical-kag(KAG 주: 구조화 데이터/chunk) 또는 evidence.md 항목(보조).
-3. **분류 (Semantic-Citation Verifier):** `docs/verifier_prompt_templates.md`로 (문장, 근거) → **SUPPORTED / PARTIAL / UNSUPPORTED** + 1줄 사유·조치.
-4. **리포트:** `review/claim_verification.md`에 `위치 | claim | [EVID:id] | 판정 | 조치` 표. PARTIAL/UNSUPPORTED는 수정 대상(주장 약화·인용 교체·근거 보강).
+1. `python3 scripts/extract_claims.py <section> --json`으로 cited claim을 추출한다.
+2. 각 `[EVID:id]`에 대해 `knowledge/evidence.md`와 필요 시 검증된 source paper/abstract/full text를 회수한다.
+3. `docs/verifier_prompt_templates.md` Semantic-Citation Verifier로 `SUPPORTED / PARTIAL / UNSUPPORTED / NOT_ENOUGH_INFORMATION`을 판정한다.
+4. `review/claim_verification.md`에 `위치 | claim | [EVID:id] | 판정 | 조치`를 기록한다.
+5. Optional domain-matched retrieval/KAG는 보조 수단일 뿐이며 없어도 검증을 수행한다.

@@ -7,6 +7,7 @@
 > `cp docs/draft_plan_template.md drafts/paper1_xxx/draft_plan.md`  (multi-paper)
 >
 > **규칙:** 모든 항목 완결 후 사용자 승인 → Phase 4 진행
+> **Basic/mechanistic conditional rule:** central contribution이 실험적 biology/mechanism이면 먼저 `chatgpt/actions/build-story-map.md`로 `drafts/story_map.md`를 만들고, 이 draft plan과 정렬시킨 뒤 승인받는다. `story_map.md`는 scientific architecture, `draft_plan.md`는 manuscript execution의 source of truth다.
 > **권장 실행:** Phase 3는 논문 방향·논조·구성을 결정하는 핵심 단계이므로 ChatGPT에서 가능한 경우 **higher reasoning effort**를 사용한다.
 
 ---
@@ -32,17 +33,38 @@
 - **논문 제목 (가안):**
 - **목표 저널:**
 - **원고 유형:** Original Article / Review / Letter / …
-- **연구 설계:** RCT / Cohort / Cross-sectional / Case series / Meta-analysis / …
+- **연구 설계:** RCT / Cohort / Cross-sectional / Case series / Meta-analysis / Basic/Mechanistic / Preclinical / …
+- **Research mode:** Clinical / Translational / Basic-Mechanistic / Hybrid
 - **질환/임상 setting (해당 시):** [breast cancer / other] — [early / neoadjuvant / adjuvant / metastatic / survivorship / other]
 - **Subtype / biomarker context (해당 시):** [HR+/HER2− / HER2+ / TNBC / HER2-low / molecular or translational subgroup / other]
 - **분석 대상/핵심 비교:** [population; intervention/exposure; comparator]
 - **Reporting guideline:** [CONSORT 2025 / STROBE / REMARK / NeoSTEEP / STEEP 2.0 / PRISMA / other as applicable; 복수 선택 가능]
 - **인용 형식:** `profile/journals.md` 확인 → [bracket / superscript / …], et al. after [N]명
 
-### Endpoint Definitions
+### Endpoint Definitions (clinical/quantitative outcome studies as applicable)
 | Endpoint | Role | Operational Definition | Time Origin / Assessment Time | Event / Censoring (if TTE) |
 |---|---|---|---|---|
 | [endpoint] | Primary/Secondary/Exploratory | [RECIST/pCR/RCB/STEEP/other as applicable] | [time zero or assessment schedule] | [event/censoring] |
+
+### Basic / Mechanistic Story Alignment (해당 시)
+
+> `docs/basic_research_guide.md`, `docs/basic_research_analysis_guide.md`, `docs/experimental_evidence_guide.md`, `docs/figure_story_guide.md`와 `drafts/story_map.md`를 사용한다.
+
+- **Central biological question:**
+- **Desired main claim:**
+- **Current evidence level:**
+- **Claim boundary / non-claim:**
+- **Weakest evidence link:**
+- **Independent experimental unit:**
+- **Biological replicate definition:**
+- **Technical replicate / nested subsample hierarchy:**
+- **Primary validation route:** [necessary / recommended / optional 구분]
+- **Allocation/randomization or blocking:** [applicable / not applicable + rationale]
+- **Blinding/masking:** [applicable / not feasible + rationale]
+- **Sample-size rationale:**
+- **Predefined exclusion / QC rules:**
+- **Important batch/block factors:**
+- **Model/reagent identity & authentication:** [cell-line authentication/mycoplasma/construct/antibody/etc. when relevant]
 
 ---
 
@@ -165,6 +187,17 @@
 
 **Oncology/translational candidates (해당 시):** patient flow; baseline disease/tumor characteristics; treatment exposure/discontinuation; RECIST waterfall/swimmer; pCR/RCB distribution; Kaplan–Meier or cumulative-incidence curves; subgroup/biomarker interaction forest plot; longitudinal ctDNA/biomarker dynamics with sampling times and evaluable denominators; safety with denominator/grading framework.
 
+### Basic / Mechanistic Figure Story (해당 시)
+
+> 단순 figure inventory가 아니라 `drafts/story_map.md`의 claim architecture와 동일해야 한다. 각 main figure는 보통 하나의 dominant claim을 담당한다.
+
+| Figure | Scientific Question | Dominant Claim | Evidence Level | Anchor Panel | Required Control/Falsifier | Next Question |
+|---|---|---|---|---|---|---|
+| Fig 1 | | | | | | |
+| Fig 2 | | | | | | |
+
+Panel별 inferential role과 main-vs-supplement 판단은 `docs/figure_story_guide.md`를 따른다.
+
 ---
 
 ## 7. Introduction Outline
@@ -246,6 +279,8 @@
 - [ ] 5. Claim→Citation mapping — ~20개 claim에 citation 모두 확보 (`[EVID:id]` 형식, evidence.md 존재 확인)
 - [ ] 6. Table/Figure plan — 개수·형식·내용 결정
 - [ ] 질환 setting/subtype, endpoint operational definitions, reporting guideline 선택 완료
+- [ ] **Basic/mechanistic 해당 시:** `drafts/story_map.md` 승인, claim boundary·experimental unit·validation route·figure dominant claim 정렬 완료
+- [ ] **Basic/mechanistic 해당 시:** `chatgpt/actions/audit-mechanism.md` Phase 3 audit PASS
 - [ ] 7. Introduction outline — 단락별 흐름 설계
 - [ ] 8. Discussion outline — 논점 3–5개 + 비교 대상 확정
 - [ ] 9. Limitation points — 대응 논리 포함

@@ -11,15 +11,23 @@ Before drafting any section, check these files:
 | Input | Purpose |
 |---|---|
 | `drafts/draft_plan.md` | Key message, tone, table/figure plan, claim-to-citation mapping |
+| `drafts/story_map.md` | Basic/mechanistic scientific architecture and figure/claim order (when applicable) |
 | `data/analysis_plan.md` | Research question, endpoints, statistical methods |
 | `results/` and `drafts/table_*.md` | Numerical results and table references |
 | `knowledge/evidence.md` | Verified citation support |
 | `Style/terminology.md` | Preferred and forbidden terminology |
 | `Style/style_guide.md` and relevant `Style/*/*.md` anchors | House style, team voice, argument patterns |
-| `docs/section_templates.md` | Section-specific structure and sentence patterns |
+| `docs/section_templates.md` | General/clinical section structure and sentence patterns |
+| `docs/basic_section_templates.md` | Basic/mechanistic conditional Methods/Results structure (when applicable) |
 | `docs/writing_guide.md` | General academic writing rules |
 
 Do not draft if `drafts/draft_plan.md` is absent or incomplete.
+
+### Research-mode routing
+
+- **Clinical:** use the standard section templates/skeletons.
+- **Basic-Mechanistic:** require approved `story_map.md`, use `docs/basic_section_templates.md`, and use `drafts/_templates/basic_methods.md` / `basic_results.md` rather than the clinical-default skeletons.
+- **Hybrid/Translational:** combine the relevant clinical and mechanistic blocks explicitly; do not force one mode's structure onto the other component.
 
 ---
 
@@ -58,7 +66,7 @@ Rules:
 
 ### Step 3. Section Template Pass
 
-Apply `docs/section_templates.md`.
+Apply `docs/section_templates.md`. For Basic-Mechanistic/Hybrid work, apply `docs/basic_section_templates.md` as the conditional override.
 
 Rules:
 - Use the section's paragraph functions.
@@ -103,9 +111,10 @@ Address high-priority findings before considering the section complete.
 1. ChatGPT main agent가 네 independent Verifier pass를 수행한다. 필요하면 sSb/mSb fresh-context reviewer를 추가한다:
    - **Constraint** — draft_plan·analysis_plan·사용자 제약 준수
    - **Citation** — `[EVID:id]` 인용이 evidence.md로 지지되는지 (방향·대상·비교군·결과 일치)
-   - **Data** — 모든 결과 수치가 `results/*.csv`로 추적되는지
+   - **Data** — study result values가 `results/*.csv`로 추적되고, experimental-design constants는 승인된 analysis plan/Methods source와 일치하는지
    - **Logic** — 섹션 간 논리 흐름·중복 (Results 해석이 Discussion으로 새지 않는지 등)
-2. 모두 PASS → `review/gates/phase_04_draft.GATE.md`에 `status: PASS` 기록 → 다음 섹션.
+   - **Targeted mechanism re-audit (basic/mechanistic, only if triggered)** — rerun `chatgpt/actions/audit-mechanism.md` during Phase 4 only when drafting changes the central claim, story-map architecture, experimental-unit interpretation, figure-level mechanistic inference, or another item that could invalidate the Phase 3 mechanism PASS. Routine section drafting does not require a full mechanism audit after every section.
+2. Required core checks all PASS (and any triggered targeted mechanism re-audit also PASS) → `review/gates/phase_04_draft.GATE.md`에 `status: PASS` 기록 → 다음 섹션.
 3. FAIL → 지적사항을 수정하고 재검증. 최대 2회(N=2), 이후 사용자에게 에스컬레이션.
 
 게이트 PASS가 원장에 기록되기 전에는 다음 섹션을 시작하지 않는다.
@@ -117,8 +126,8 @@ Address high-priority findings before considering the section complete.
 | Section | Must Use | Must Not Use |
 |---|---|---|
 | Introduction | Background evidence, gap, purpose | Current study results or interpretation |
-| Methods | Approved design, endpoints, analyses | Results, post hoc methods not in analysis plan |
-| Results | Tables, figures, analysis outputs | Interpretation, clinical implications, causal claims |
+| Methods | Approved design, endpoints/experimental readouts, analyses | Results, post hoc methods not in analysis plan |
+| Results | Tables, figures, analysis outputs, story-map claims | Speculation, clinical implications, or causal/mechanistic claims stronger than the experimental design |
 | Discussion | Principal findings, comparison, implications, limitations | New results, unsupported claims, overstatement |
 | Conclusion | Brief take-home message | New claims, exact numbers, overgeneralization |
 
@@ -146,6 +155,6 @@ Use this sequence after each produce step:
 3. Record the result in `review/gates/phase_NN_<name>.GATE.md`.
 4. Confirm the ledger before proceeding:
 
-```powershell
-python3 scripts/check_gate.py review/gates\phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --verify-hash results=results/table2_outcomes.csv
+```bash
+python3 scripts/check_gate.py review/gates/phase_04_draft.GATE.md --artifact drafts/05_results.md --require-check constraint --require-check citation --require-check numbers --require-check logic --verify-hash artifact=drafts/05_results.md --verify-hash results=results/table2_outcomes.csv
 ```

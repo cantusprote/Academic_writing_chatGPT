@@ -1,21 +1,22 @@
 # Academic Writing for ChatGPT + Shellby
 
-Breast medical oncology / translational research manuscript workflow for **ChatGPT working directly with local files through Shellby**.
+Breast medical oncology / translational / basic-mechanistic research manuscript workflow for **ChatGPT working directly with local files through Shellby**.
 
 - Mac Studio local work: **sSb**
 - MacBook local work: **mSb**
 - Core instructions: **`CHATGPT.md`**
 - Upstream baseline: `grotyx/Academic_writing_c_claudecode` v1.6.3 (`e0527e2`)
-- Custom workflow version: **Sim Oncology ChatGPT v0.2.0**
+- Custom workflow version: **Sim Oncology ChatGPT v0.3.0**
 
 ## What this project does
 
 The workflow keeps the strong upstream verification harness while making ChatGPT the orchestrator. It supports:
 
 - evidence registry with `[EVID:id]` citation grounding
-- `results/*.csv` as the numerical source of truth
+- `results/*.csv` as the source of truth for study result values
 - analysis-plan and draft-plan approval gates
 - breast-oncology endpoint/estimand guidance
+- basic/mechanistic experimental-unit, replication, figure-story, and mechanism-claim workflow
 - survival, competing-risk, landmark/time-dependent analyses
 - biomarker interaction and ctDNA/MRD methodology
 - style/terminology control
@@ -37,6 +38,8 @@ Examples:
 | “analysis plan 만들어줘” | creates `data/analysis_plan.md`, then waits for approval |
 | “이 plan대로 분석해” | runs analysis only after approval and writes `results/` |
 | “draft plan 만들어줘” | creates `drafts/draft_plan.md` |
+| “basic research story map 만들어줘” | creates/updates `drafts/story_map.md` and claim→evidence→figure architecture |
+| “mechanism이 충분한지 audit 해줘” | runs the basic/mechanistic claim-strength audit |
 | “Methods 작성해” | drafts from the approved plan and grounded sources |
 | “전체 검증해” | runs deterministic + semantic verification and gate checks |
 | “oncology checklist 돌려” | applies `docs/oncology_checklist.md` |
@@ -48,7 +51,7 @@ Examples:
 1. **Setup & evidence** — define topic/journal/design; register verified references in `knowledge/evidence.md`.
 2. **Analysis plan** — create and approve `data/analysis_plan.md` before analysis.
 3. **Analysis** — scripts in `data/py/`; canonical numerical outputs in `results/`.
-4. **Draft plan** — create and approve `drafts/draft_plan.md`, including claim-to-citation mapping.
+4. **Draft plan** — create and approve `drafts/draft_plan.md`; for substantial basic/mechanistic work also create/approve `drafts/story_map.md` and pass the Phase 3 mechanism audit.
 5. **Draft** — Methods → Results → Introduction → Discussion → Conclusion → Abstract → Title.
 6. **Style & QC** — terminology/style checks, oncology checklist, deterministic verification, semantic verifier passes.
 7. **Finalize** — reference formatting and DOCX outputs.
@@ -76,6 +79,12 @@ For breast oncology/translational work, `docs/oncology_analysis_guide.md` overri
 
 Use `docs/oncology_checklist.md` during planning and Phase 6 QC.
 
+## Basic / mechanistic layer
+
+For wet-lab, preclinical, tumor-biology, cell/molecular, organoid, animal, imaging, or omics-mechanistic work, use `docs/basic_research_analysis_guide.md`, `docs/basic_research_guide.md`, `docs/experimental_evidence_guide.md`, and `docs/basic_section_templates.md`. Build `drafts/story_map.md` before drafting a substantial mechanistic paper and run `chatgpt/actions/audit-mechanism.md` at Phase 3 and again at Phase 6.
+
+Result values must trace to `results/*.csv`; experimental-design constants such as dose, incubation time, replicate plan, and acquisition settings trace to the approved analysis plan/Methods source.
+
 ## Important files
 
 - `CHATGPT.md` — source of truth for workflow and rules
@@ -83,6 +92,9 @@ Use `docs/oncology_checklist.md` during planning and Phase 6 QC.
 - `chatgpt/actions/` — natural-language task playbooks
 - `docs/oncology_analysis_guide.md` — oncology statistics/methodology override
 - `docs/oncology_checklist.md` — oncology QC checklist
+- `docs/basic_research_analysis_guide.md` — basic/mechanistic experimental design/statistics override
+- `docs/basic_research_checklist.md` — mechanistic/reproducibility QC
+- `drafts/story_map.md` — paper-specific claim/evidence/figure architecture when applicable
 - `Style/terminology.md` — breast oncology terminology registry
 - `knowledge/evidence.md` — canonical citation ledger
 - `data/analysis_plan.md` — mandatory analysis plan
@@ -115,6 +127,6 @@ The upstream v1.6.3 verification framework and its tests are retained unless exp
 
 - `upstream` is read-only and must never receive pushes.
 - `origin` is reserved for the user's own repository.
-- PDFs, private style anchors, and profile information remain local/ignored.
+- PDFs, private style anchors, and profile information remain local/ignored. Bootstrap local profile files from `profile.example/`.
 
 See `docs/customization.md` for the fork history and design rationale.

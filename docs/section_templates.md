@@ -1,6 +1,7 @@
 # Section Templates and Sentence Patterns
 
 > Use this file during the Section Template Pass in `docs/drafting_protocol.md`.
+> **Research-mode override:** for Basic-Mechanistic/Hybrid projects, also read `docs/basic_section_templates.md`; its Methods/Results structure overrides conflicting clinical-only patterns below.
 > Sentence patterns are scaffolds. Replace bracketed content and avoid copying source papers verbatim.
 
 ---

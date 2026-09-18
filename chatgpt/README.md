@@ -14,5 +14,7 @@ Core examples:
 - “critical review 해” → `critical-review.md`
 - “editor review 해” → `editor-review.md`
 - “논문 방향을 토론해봐” → `paper-debate.md`
+- “basic research story map 만들어줘” → `build-story-map.md`
+- “mechanism이 충분한지 audit 해줘” → `audit-mechanism.md`
 
-`CHATGPT.md` is the source of truth. These playbooks must not override its phase gates, citation rules, oncology methods, or Git safety rules.
+`CHATGPT.md` is the source of truth. These playbooks must not override its phase gates, citation rules, oncology/basic-mechanistic methods, verification gates, or Git safety rules.

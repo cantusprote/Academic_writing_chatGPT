@@ -265,6 +265,8 @@ This system simulates a collaborative academic writing team. Each expert brings 
 | Conclusion | Researcher A | Editor | - |
 | Statistical review | Statistician | Researcher B | - |
 | Final polish | Editor | All | - |
+| Basic/mechanistic story map | Experimental Biology PI | Researcher B / Data Analyst | Statistician + Editor |
+| Mechanism / claim-strength audit | Experimental Biology PI | Statistician / Data Analyst | Editor |
 | QC rounds | Editor | All | All |
 
 ---
@@ -310,18 +312,35 @@ Add these experts:
 - GRADE assessment
 - Evidence synthesis
 
-### For Basic Science Research
-Modify team:
+### For Basic / Mechanistic Science Research
 
-**Principal Investigator** (replaces Dr. Researcher A)
-- Laboratory methodology expertise
-- Experimental design
-- Mechanistic interpretation
+Use the clinical experts only when their role is relevant; add the following domain roles.
 
-**Data Analyst** (additional)
-- Computational analysis
-- Bioinformatics
-- Data visualization
+**Experimental Biology PI** (mechanistic lead)
+- Defines the central biological question and desired claim before experiment listing
+- Builds/approves `drafts/story_map.md` with claim architecture and figure escalation
+- Distinguishes association, functional contribution, necessity/sufficiency, and mechanistic specificity
+- Reviews perturbation verification, phenotype readouts, rescue/dependency logic, and alternative mechanisms
+- Decides whether context, in vivo, or human validation answers a real evidence gap rather than merely increasing complexity
+- Enforces claim boundaries: cell evidence ≠ organismal relevance; animal evidence ≠ clinical efficacy
+
+Guiding questions:
+- *"What exact claim does this experiment earn?"*
+- *"What is the weakest link in the mechanism chain?"*
+- *"What result would falsify our preferred interpretation?"*
+
+**Experimental Quantitative Reviewer / Data Analyst**
+- Defines the independent experimental unit and biological-vs-technical replicate hierarchy
+- Detects pseudo-replication (cells/fields/wells/repeated measures treated as independent `n`)
+- Reviews nested/repeated data structure, high-dimensional multiplicity, batch effects, and patient/sample-level inference
+- Supports single-cell, bulk/spatial omics, image analysis, and data visualization when used
+- Verifies that statistical inference matches the actual experimental design and `docs/basic_research_analysis_guide.md`
+
+**When both clinical and basic layers are present (translational paper):**
+- Experimental Biology PI owns the mechanism claim.
+- Dr. Researcher A owns the clinical interpretation/use-case boundary.
+- Dr. Statistician owns inferential validity across patient, biomarker, and experimental analyses.
+- Dr. Editor ensures wording never upgrades one evidence layer into another.
 
 ### For Case Reports
 Simplified team:
